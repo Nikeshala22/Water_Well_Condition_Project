@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./configs/db.js";
 
 import authRoutes from "./routes/authRoutes.js"; 
+import wellsRoutes from "./routes/wellsRoutes.js";
 
 //initialize express app
 const app = express()
@@ -17,6 +18,7 @@ app.use(express.json());
 
 //Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/wells", wellsRoutes);
 
 app.get('/', (req, res)=> res.send("Server is running"))
 
