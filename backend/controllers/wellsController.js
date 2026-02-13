@@ -104,7 +104,7 @@ export const deleteWell = async (req, res) => {
     const well = await Well.findById(req.params.id);
     if (!well) return res.status(404).json({ message: "Well not found" });
 
-    await well.deleteOne(); // Completely removes the document
+    await well.deleteOne(); // Completely removes the document in database
 
     res.status(200).json({
       success: true,
