@@ -32,7 +32,6 @@ export const createReport = async (req, res) => {
 export const getReports = async (req, res) => {
   try {
     const reports = await Report.find()
-      .populate("wellId")
       .populate("reportedBy", "username")
       .populate("comments.commentedBy", "username")
       .sort({ createdAt: -1 });
