@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 
+
+
 const wellSchema = new mongoose.Schema(
   {
+    wellId: { 
+      type: String, 
+      unique: true },
+
     name: {
       type: String,
       required: true,
@@ -53,5 +59,6 @@ const wellSchema = new mongoose.Schema(
 
 // Required for geo search later
 wellSchema.index({ location: "2dsphere" });
+
 
 export default mongoose.model("Well", wellSchema);

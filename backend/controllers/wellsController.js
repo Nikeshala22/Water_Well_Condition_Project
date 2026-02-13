@@ -5,11 +5,17 @@ import Well from "../models/Well.js";
 // =====================
 export const createWell = async (req, res) => {
   try {
-    const { name, village, lat, lng, depth, type } = req.body;
-    if (!name || !village || !lat || !lng || !depth || !type)
+    const { wellId, name, village, lat, lng, depth, type } = req.body;
+    if (!wellId || !name || !village || !lat || !lng || !depth || !type)
       return res.status(400).json({ message: "All fields are required" });
-
+    
+    // Check if wellId already exists
+    const existingWell = await Well.findOne({ wellId });
+    if (existingWell) {
+      return res.status(400).json({ message: "wellId already exists. Please use a unique wellId." });
+    }
     const well = await Well.create({
+      wellId,
       name,
       village,
       depth,
@@ -40,13 +46,23 @@ export const getAllWells = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-// =====================
-// Get Single Well by ID
-// =====================
+// Get single well by Mongo _id
 export const getWellById = async (req, res) => {
   try {
-    const well = await Well.findById(req.params.id);
+    const { id } = req.params;
+    const well = await Well.findById(id);
+    if (!well) return res.status(404).json({ message: "Well not found" });
+    res.status(200).json({ success: true, data: well });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get single well by wellId (manual input)
+export const getWellByWellId = async (req, res) => {
+  try {
+    const { wellId } = req.params;
+    const well = await Well.findOne({ wellId });
     if (!well) return res.status(404).json({ message: "Well not found" });
     res.status(200).json({ success: true, data: well });
   } catch (error) {
@@ -104,7 +120,7 @@ export const deleteWell = async (req, res) => {
     const well = await Well.findById(req.params.id);
     if (!well) return res.status(404).json({ message: "Well not found" });
 
-    await well.deleteOne(); // Completely removes the document in database
+    await well.deleteOne(); // Completely removes the document in
 
     res.status(200).json({
       success: true,
