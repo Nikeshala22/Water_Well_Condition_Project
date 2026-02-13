@@ -17,8 +17,6 @@ const commentSchema = new mongoose.Schema({
   },
 });
 
-
-// Main Report Schema
 const reportSchema = new mongoose.Schema(
   {
     wellId: {
