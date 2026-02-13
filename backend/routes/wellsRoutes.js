@@ -26,7 +26,7 @@ router.put("/:id", protect, authorizeRoles("admin"), updateWell);
 // Update status (Admin + Field Officer)
 router.patch("/:id/status", protect, authorizeRoles("admin", "field_officer"), updateWellStatus);
 
-// Hard Delete (Admin only)
+// Delete well (Admin only)
 router.delete("/:id", protect, authorizeRoles("admin"), deleteWell);
 
 
