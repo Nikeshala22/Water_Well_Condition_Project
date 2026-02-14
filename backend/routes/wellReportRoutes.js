@@ -3,7 +3,7 @@ import upload from "../middleware/upload.js";
 import {
   createReport,
   getReports,
-  addComment,
+  addComment, 
 } from "../controllers/wellReportController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -25,5 +25,6 @@ router.post("/", protect, fieldOfficerOnly, upload.array("photos", 5), createRep
 router.get("/", protect, fieldOfficerOnly, getReports);
 
 router.post("/:id/comments", protect, fieldOfficerOnly, addComment);
+
 
 export default router;

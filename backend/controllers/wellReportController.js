@@ -42,7 +42,6 @@ export const getReports = async (req, res) => {
   }
 };
 
-
 // ADD COMMENT
 export const addComment = async (req, res) => {
   try {
@@ -69,3 +68,4 @@ export const addComment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
