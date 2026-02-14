@@ -3,7 +3,9 @@ import upload from "../middleware/upload.js";
 import {
   createReport,
   getReports,
-  addComment, 
+  addComment,
+   getAllComments,      
+  getWellComments      
 } from "../controllers/wellReportController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -26,5 +28,10 @@ router.get("/", protect, fieldOfficerOnly, getReports);
 
 router.post("/:id/comments", protect, fieldOfficerOnly, addComment);
 
+// Display all comments
+router.get("/comments/all", protect, fieldOfficerOnly, getAllComments);
+
+// Display comments for a specific well
+router.get("/comments/well/:wellId", protect, fieldOfficerOnly, getWellComments);
 
 export default router;
