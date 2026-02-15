@@ -9,7 +9,7 @@ export const createWell = async (req, res) => {
     if (!wellId || !name || !village || !lat || !lng || !depth || !type)
       return res.status(400).json({ message: "All fields are required" });
     
-    // Check if wellId already exists
+    // add validation part for Check if wellId already exists
     const existingWell = await Well.findOne({ wellId });
     if (existingWell) {
       return res.status(400).json({ message: "wellId already exists. Please use a unique wellId." });
