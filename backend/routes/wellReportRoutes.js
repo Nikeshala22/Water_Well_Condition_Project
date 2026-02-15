@@ -4,8 +4,9 @@ import {
   createReport,
   getReports,
   addComment,
-   getAllComments,      
-  getWellComments      
+  getAllComments,      
+  getWellComments,
+  updateComment    
 } from "../controllers/wellReportController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -33,5 +34,10 @@ router.get("/comments/all", protect, fieldOfficerOnly, getAllComments);
 
 // Display comments for a specific well
 router.get("/comments/well/:wellId", protect, fieldOfficerOnly, getWellComments);
+
+// Update a comment
+router.put("/:reportId/comments/:commentId",protect,fieldOfficerOnly,updateComment
+);
+
 
 export default router;

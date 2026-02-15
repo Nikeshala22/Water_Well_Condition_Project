@@ -124,3 +124,42 @@ export const getWellComments = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// UPDATE COMMENT
+export const updateComment = async (req, res) => {
+  try {
+    const { reportId, commentId } = req.params;
+    const { message } = req.body;
+
+    // Find the report
+    const report = await Report.findById(reportId).populate(
+      "comments.commentedBy",
+      "username"
+    );
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    // Find the comment
+    const comment = report.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    // Check if the logged-in user is the author
+    if (comment.commentedBy._id.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You can only update your own comments" });
+    }
+
+    // Update the message
+    comment.message = message;
+    await report.save();
+
+    res.status(200).json({
+      message: "Comment updated successfully",
+      comment,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
