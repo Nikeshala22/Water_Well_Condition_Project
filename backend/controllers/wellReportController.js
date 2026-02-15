@@ -163,3 +163,38 @@ export const updateComment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// DELETE COMMENT
+export const deleteComment = async (req, res) => {
+  try {
+    const { reportId, commentId } = req.params;
+
+    // Find the report
+    const report = await Report.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    // Find the comment index
+    const comment = report.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    // Check if logged-in user is the author or admin
+    if (comment.commentedBy.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(403).json({ message: "You can only delete your own comments" });
+    }
+
+    // Remove the comment using pull
+    report.comments.pull({ _id: commentId });
+
+    await report.save();
+
+    res.status(200).json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

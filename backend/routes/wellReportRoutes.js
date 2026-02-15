@@ -6,7 +6,8 @@ import {
   addComment,
   getAllComments,      
   getWellComments,
-  updateComment    
+  updateComment,
+  deleteComment   
 } from "../controllers/wellReportController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -38,6 +39,11 @@ router.get("/comments/well/:wellId", protect, fieldOfficerOnly, getWellComments)
 // Update a comment
 router.put("/:reportId/comments/:commentId",protect,fieldOfficerOnly,updateComment
 );
+
+// Delete a comment
+router.delete("/:reportId/comments/:commentId", protect, fieldOfficerOnly, deleteComment);
+
+
 
 
 export default router;
