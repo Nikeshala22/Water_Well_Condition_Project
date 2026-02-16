@@ -41,6 +41,43 @@ export const getReports = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// GET REPORTS FOR A SPECIFIC WELL
+export const getReportsByWell = async (req, res) => {
+  try {
+    const { wellId } = req.params;
+
+    const reports = await Report.find({ wellId })
+      .populate("reportedBy", "username")
+      .populate("comments.commentedBy", "username")
+      .sort({ createdAt: -1 });
+
+    if (!reports.length) {
+      return res.status(404).json({ message: "No reports found for this well" });
+    }
+
+    res.status(200).json(reports);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET SINGLE REPORT BY ID
+export const getSingleReport = async (req, res) => {
+  try {
+    const report = await Report.findById(req.params.id)
+      .populate("reportedBy", "username")
+      .populate("comments.commentedBy", "username");
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    res.status(200).json(report);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 // ADD COMMENT
 export const addComment = async (req, res) => {

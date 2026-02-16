@@ -7,7 +7,9 @@ import {
   getAllComments,      
   getWellComments,
   updateComment,
-  deleteComment   
+  deleteComment,
+  getReportsByWell,
+  getSingleReport,
 } from "../controllers/wellReportController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -28,6 +30,10 @@ router.post("/", protect, fieldOfficerOnly, upload.array("photos", 5), createRep
 
 router.get("/", protect, fieldOfficerOnly, getReports);
 
+router.get("/well/:wellId", protect, fieldOfficerOnly, getReportsByWell);
+
+
+//Add comment
 router.post("/:id/comments", protect, fieldOfficerOnly, addComment);
 
 // Display all comments
@@ -42,6 +48,9 @@ router.put("/:reportId/comments/:commentId",protect,fieldOfficerOnly,updateComme
 
 // Delete a comment
 router.delete("/:reportId/comments/:commentId", protect, fieldOfficerOnly, deleteComment);
+
+router.get("/:id", protect, fieldOfficerOnly, getSingleReport);
+
 
 
 
