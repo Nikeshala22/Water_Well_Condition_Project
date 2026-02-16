@@ -7,9 +7,10 @@ export const createReport = async (req, res) => {
     const { wellId, waterLevel, pumpStatus, severity, description } =
       req.body;
 
-    const photoFiles = req.files
-      ? req.files.map((file) => file.filename)
-      : [];
+    const photoFile = req.files && req.files.length > 0
+   ? [req.files[0].filename]
+   : [];
+
 
     const report = await Report.create({
       wellId,
@@ -17,7 +18,7 @@ export const createReport = async (req, res) => {
       pumpStatus,
       severity,
       description,
-      photos: photoFiles,
+      photos: photoFile,
       reportedBy: req.user.id,
     });
 
@@ -36,11 +37,21 @@ export const getReports = async (req, res) => {
       .populate("comments.commentedBy", "username")
       .sort({ createdAt: -1 });
 
-    res.status(200).json(reports);
+    const updatedReports = reports.map(report => {
+      const reportObj = report.toObject();
+      reportObj.photos = report.photos.map(photo =>
+        `${req.protocol}://${req.get("host")}/uploads/${photo}`
+      );
+      return reportObj;
+    });
+
+    res.status(200).json(updatedReports);
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 // GET REPORTS FOR A SPECIFIC WELL
 export const getReportsByWell = async (req, res) => {
   try {
@@ -51,15 +62,32 @@ export const getReportsByWell = async (req, res) => {
       .populate("comments.commentedBy", "username")
       .sort({ createdAt: -1 });
 
-    if (!reports.length) {
-      return res.status(404).json({ message: "No reports found for this well" });
+    if (!reports || reports.length === 0) {
+      return res.status(404).json({
+        message: "No reports found for this well",
+      });
     }
 
-    res.status(200).json(reports);
+    // Convert photo filenames to full URLs
+    const updatedReports = reports.map(report => {
+      const reportObj = report.toObject();
+
+      reportObj.photos = report.photos.map(photo =>
+        `${req.protocol}://${req.get("host")}/uploads/${photo}`
+      );
+
+      return reportObj;
+    });
+
+    res.status(200).json(updatedReports);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
+
 
 // GET SINGLE REPORT BY ID
 export const getSingleReport = async (req, res) => {
@@ -72,7 +100,67 @@ export const getSingleReport = async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
 
-    res.status(200).json(report);
+    const reportObj = report.toObject();
+
+    reportObj.photos = report.photos.map(photo =>
+  `${req.protocol}://${req.get("host")}/uploads/${photo}`
+);
+
+res.status(200).json(reportObj);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// UPDATE REPORT
+export const updateReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      waterLevel,
+      pumpStatus,
+      severity,
+      description,
+      status,
+    } = req.body;
+
+    const report = await Report.findById(id);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    // Optional: Allow only report owner or admin
+    if (
+      report.reportedBy.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(403)
+        .json({ message: "You can only update your own reports" });
+    }
+
+    // Update fields if provided
+    if (waterLevel) report.waterLevel = waterLevel;
+    if (pumpStatus) report.pumpStatus = pumpStatus;
+    if (severity) report.severity = severity;
+    if (description) report.description = description;
+    if (status) report.status = status;
+
+    // If new photos uploaded
+   if (req.files && req.files.length > 0) {
+   report.photos = [req.files[0].filename]; // replace old image
+   }
+
+
+    await report.save();
+
+    res.status(200).json({
+      message: "Report updated successfully",
+      report,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -10,6 +10,7 @@ import {
   deleteComment,
   getReportsByWell,
   getSingleReport,
+  updateReport        
 } from "../controllers/wellReportController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -32,6 +33,8 @@ router.get("/", protect, fieldOfficerOnly, getReports);
 
 router.get("/well/:wellId", protect, fieldOfficerOnly, getReportsByWell);
 
+// Update report
+router.put("/:id",protect,fieldOfficerOnly,upload.array("photos", 5),updateReport);
 
 //Add comment
 router.post("/:id/comments", protect, fieldOfficerOnly, addComment);
