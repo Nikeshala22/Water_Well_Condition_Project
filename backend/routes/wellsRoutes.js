@@ -18,7 +18,7 @@ router.post("/", protect, authorizeRoles("admin"), createWell);
 // Get all wells (Admin, Field Officer, Visitor)
 router.get("/", protect, authorizeRoles("admin", "field_officer", "visitor"), getAllWells);
 
-// Get single well by Mongo _id
+// Get single well by Mongodb _id
 router.get("/id/:id", protect, authorizeRoles("admin", "field_officer", "visitor"), getWellById);
 
 // Get Single Well by input wellId
