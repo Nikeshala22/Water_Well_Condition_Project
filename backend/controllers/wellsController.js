@@ -46,6 +46,7 @@ export const getAllWells = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 // Get single well by Mongo _id
 export const getWellById = async (req, res) => {
   try {
