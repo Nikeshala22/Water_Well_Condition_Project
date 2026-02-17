@@ -20,8 +20,10 @@ router.get("/", protect, authorizeRoles("admin", "field_officer", "visitor"), ge
 
 // Get single well by Mongo _id
 router.get("/id/:id", protect, authorizeRoles("admin", "field_officer", "visitor"), getWellById);
-// **Get Single Well by wellId**
+
+// Get Single Well by input wellId
 router.get("/wellId/:wellId", protect, authorizeRoles("admin", "field_officer", "visitor"), getWellByWellId);
+
 // Update metadata (Admin only)
 router.put("/:id", protect, authorizeRoles("admin"), updateWell);
 
