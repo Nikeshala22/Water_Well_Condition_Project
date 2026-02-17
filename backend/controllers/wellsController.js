@@ -29,9 +29,9 @@ export const createWell = async (req, res) => {
   }
 };
 
-// =====================
+
 // Get All Wells
-// =====================
+
 export const getAllWells = async (req, res) => {
   try {
     const { village, status } = req.query;
