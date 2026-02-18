@@ -9,10 +9,7 @@ export const createReport = async (req, res) => {
     const { wellId, waterLevel, pumpStatus, severity, description } =
       req.body;
 
-    const photoFile = req.files && req.files.length > 0
-   ? [req.files[0].filename]
-   : [];
-
+   const photoFile = req.file ? [req.file.filename] : [];
 
     const report = await Report.create({
       wellId,
@@ -134,16 +131,6 @@ export const updateReport = async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
 
-    // Optional: Allow only report owner or admin
-    if (
-      report.reportedBy.toString() !== req.user.id &&
-      req.user.role !== "admin"
-    ) {
-      return res
-        .status(403)
-        .json({ message: "You can only update your own reports" });
-    }
-
     // Update fields if provided
     if (waterLevel) report.waterLevel = waterLevel;
     if (pumpStatus) report.pumpStatus = pumpStatus;
@@ -151,11 +138,9 @@ export const updateReport = async (req, res) => {
     if (description) report.description = description;
     if (status) report.status = status;
 
-    // If new photos uploaded
-   if (req.files && req.files.length > 0) {
-   report.photos = [req.files[0].filename]; // replace old image
-   }
-
+   if (req.file) {
+   report.photos = [req.file.filename];
+}
 
     await report.save();
 
