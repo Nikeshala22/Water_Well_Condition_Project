@@ -1,4 +1,6 @@
 import Report from "../models/reportModel.js";
+import fs from "fs";
+import path from "path";
 
 
 // CREATE REPORT
@@ -165,6 +167,40 @@ export const updateReport = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+// DELETE REPORT BY ID
+export const deleteReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the report
+    const report = await Report.findById(id);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    // Optional: Delete images from server
+    if (report.photos && report.photos.length > 0) {
+      report.photos.forEach(photo => {
+        const filePath = path.join("uploads", photo);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      });
+    }
+
+    // Delete the report from database
+    await report.deleteOne();
+
+    res.status(200).json({ message: "Report deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 
 // ADD COMMENT
