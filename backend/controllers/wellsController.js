@@ -130,7 +130,7 @@ export const updateWell = async (req, res) => {
     const well = await Well.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!well) {
@@ -162,7 +162,7 @@ export const updateWellStatus = async (req, res) => {
     const well = await Well.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!well) {
