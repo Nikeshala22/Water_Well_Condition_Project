@@ -20,8 +20,8 @@ const commentSchema = new mongoose.Schema({
 const reportSchema = new mongoose.Schema(
   {
     wellId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Well",
+      type: String,        
+      ref: "Well",  
       required: true,
     },
 

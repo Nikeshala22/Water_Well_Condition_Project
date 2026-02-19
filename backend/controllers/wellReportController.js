@@ -1,18 +1,20 @@
 import Report from "../models/reportModel.js";
+import Well from "../models/Well.js";
 import fs from "fs";
 import path from "path";
 
-
-// CREATE REPORT
 export const createReport = async (req, res) => {
   try {
-    const { wellId, waterLevel, pumpStatus, severity, description } =
-      req.body;
+    const { wellId, waterLevel, pumpStatus, severity, description } = req.body;
 
-   const photoFile = req.file ? [req.file.filename] : [];
+    // Check if Well exists
+    const well = await Well.findOne({ wellId });
+    if (!well) return res.status(404).json({ message: "Well not found" });
+
+    const photoFile = req.file ? [req.file.filename] : [];
 
     const report = await Report.create({
-      wellId,
+      wellId,             
       waterLevel,
       pumpStatus,
       severity,
@@ -21,35 +23,65 @@ export const createReport = async (req, res) => {
       reportedBy: req.user.id,
     });
 
-    res.status(201).json(report);
+    const reportObj = report.toObject();
+
+reportObj.photos = report.photos.map(photo =>
+  `${req.protocol}://${req.get("host")}/uploads/${photo}`
+);
+
+res.status(201).json(reportObj);
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 
-// GET ALL REPORTS
+
 export const getReports = async (req, res) => {
   try {
     const reports = await Report.find()
+      .select("wellId waterLevel pumpStatus severity description photos status reportedBy comments createdAt")
       .populate("reportedBy", "username")
       .populate("comments.commentedBy", "username")
       .sort({ createdAt: -1 });
 
-    const updatedReports = reports.map(report => {
-      const reportObj = report.toObject();
-      reportObj.photos = report.photos.map(photo =>
-        `${req.protocol}://${req.get("host")}/uploads/${photo}`
-      );
-      return reportObj;
+    const cleanedReports = reports.map(report => {
+      return {
+        _id: report._id,
+        wellId: typeof report.wellId === "object"
+          ? report.wellId.wellId   // if populated object
+          : report.wellId,         // if string
+
+        waterLevel: report.waterLevel,
+        pumpStatus: report.pumpStatus,
+        severity: report.severity,
+        description: report.description,
+        status: report.status,
+        createdAt: report.createdAt,
+
+        photos: report.photos.map(photo =>
+          `${req.protocol}://${req.get("host")}/uploads/${photo}`
+        ),
+
+        reportedBy: report.reportedBy,
+
+        comments: report.comments.map(comment => ({
+          _id: comment._id,
+          message: comment.message,
+          commentedBy: comment.commentedBy,
+          commentedAt: comment.commentedAt
+        }))
+      };
     });
 
-    res.status(200).json(updatedReports);
+    res.status(200).json(cleanedReports);
 
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // GET REPORTS FOR A SPECIFIC WELL
 export const getReportsByWell = async (req, res) => {
@@ -144,10 +176,18 @@ export const updateReport = async (req, res) => {
 
     await report.save();
 
-    res.status(200).json({
-      message: "Report updated successfully",
-      report,
-    });
+const updatedReport = report.toObject();
+
+// Convert filenames to full URLs
+updatedReport.photos = report.photos.map(photo =>
+  `${req.protocol}://${req.get("host")}/uploads/${photo}`
+);
+
+res.status(200).json({
+  message: "Report updated successfully",
+  report: updatedReport,
+});
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
