@@ -49,7 +49,6 @@ const reportSchema = new mongoose.Schema(
       minlength: 10,
     },
 
-    // Store uploaded image file names
     photos: [
       {
         type: String,

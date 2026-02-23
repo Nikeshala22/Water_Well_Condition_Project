@@ -50,8 +50,8 @@ export const getReports = async (req, res) => {
       return {
         _id: report._id,
         wellId: typeof report.wellId === "object"
-          ? report.wellId.wellId   // if populated object
-          : report.wellId,         // if string
+          ? report.wellId.wellId   
+          : report.wellId,         
 
         waterLevel: report.waterLevel,
         pumpStatus: report.pumpStatus,
@@ -207,7 +207,7 @@ export const deleteReport = async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
 
-    // Optional: Delete images from server
+    //Delete images from server
     if (report.photos && report.photos.length > 0) {
       report.photos.forEach(photo => {
         const filePath = path.join("uploads", photo);

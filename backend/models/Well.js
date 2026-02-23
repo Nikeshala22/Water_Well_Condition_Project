@@ -6,7 +6,10 @@ const wellSchema = new mongoose.Schema(
   {
     wellId: { 
       type: String, 
-      unique: true },
+      unique: true,
+      trim: true,
+      uppercase: true, // prevents case duplicates
+       },
 
     name: {
       type: String,
