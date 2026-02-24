@@ -19,3 +19,11 @@ export const updateRequest = async (id, data) => {
 export const deleteRequest = async (id) => {
   return await MaintenanceRequest.findByIdAndDelete(id);
 };
+
+export const assignRequest = async (id, assignedTo) => {
+  return await MaintenanceRequest.findByIdAndUpdate(
+    id,
+    { assignedTo, status: "InProgress" },
+    { new: true }
+  ).populate("wellId requestedBy assignedTo");
+};

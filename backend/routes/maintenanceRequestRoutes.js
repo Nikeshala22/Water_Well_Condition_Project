@@ -5,6 +5,7 @@ import {
   getById,
   update,
   deleteReq,
+  assign,
 } from "../controllers/maintenanceRequestController.js";
 import {
   validateCreateMaintenanceRequest,
@@ -22,6 +23,7 @@ router.post("/", authorizeRoles("communityUser"), validateCreateMaintenanceReque
 router.get("/", getAll);
 router.get("/:id", getById);
 router.put("/:id", authorizeRoles("fieldOfficer"), validateUpdateMaintenanceRequest, update);
+router.patch("/:id/assign", authorizeRoles("admin"), assign);
 router.delete("/:id", authorizeRoles("admin"), deleteReq);
 
 export default router;

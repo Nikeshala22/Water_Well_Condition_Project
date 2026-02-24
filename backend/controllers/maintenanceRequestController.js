@@ -52,3 +52,18 @@ export const deleteReq = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// PATCH /api/maintenance/:id/assign
+export const assign = async (req, res) => {
+  try {
+    const { assignedTo } = req.body;
+    if (!assignedTo) {
+      return res.status(400).json({ message: "assignedTo is required" });
+    }
+    const request = await maintenanceService.assignRequest(req.params.id, assignedTo);
+    if (!request) return res.status(404).json({ message: "Maintenance Request not found" });
+    res.json(request);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
