@@ -5,16 +5,33 @@ import path from "path";
 
 export const createReport = async (req, res) => {
   try {
-    const { wellId, waterLevel, pumpStatus, severity, description } = req.body;
+    let { wellId, waterLevel, pumpStatus, severity, description } = req.body;
 
-    // Check if Well exists
+    wellId = wellId.trim().toUpperCase();
+
+    //Check if well exists
     const well = await Well.findOne({ wellId });
-    if (!well) return res.status(404).json({ message: "Well not found" });
+
+    if (!well) {
+      return res.status(404).json({ message: "Well not found" });
+    }
+
+    // Check if user already reported this well
+    const existingReport = await Report.findOne({
+      wellId,
+      reportedBy: req.user.id,
+    });
+
+    if (existingReport) {
+      return res.status(400).json({
+        message: "You have already submitted a report for this well",
+      });
+    }
 
     const photoFile = req.file ? [req.file.filename] : [];
 
     const report = await Report.create({
-      wellId,             
+      wellId,
       waterLevel,
       pumpStatus,
       severity,
@@ -25,18 +42,16 @@ export const createReport = async (req, res) => {
 
     const reportObj = report.toObject();
 
-reportObj.photos = report.photos.map(photo =>
-  `${req.protocol}://${req.get("host")}/uploads/${photo}`
-);
+    reportObj.photos = report.photos.map(photo =>
+      `${req.protocol}://${req.get("host")}/uploads/${photo}`
+    );
 
-res.status(201).json(reportObj);
+    res.status(201).json(reportObj);
 
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 export const getReports = async (req, res) => {
   try {
