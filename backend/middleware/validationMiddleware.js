@@ -41,3 +41,12 @@ export const validateUpdateMaintenanceRequest = [
     .withMessage("Priority must be Low, Medium, or High"),
   handleValidationErrors,
 ];
+
+export const validateUpdateStatus = [
+  body("status")
+    .notEmpty()
+    .withMessage("Status is required")
+    .isIn(["Pending", "InProgress", "Completed"])
+    .withMessage("Invalid status"),
+  handleValidationErrors,
+];

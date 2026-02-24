@@ -67,3 +67,33 @@ export const assign = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// PATCH /api/maintenance/:id/status
+export const updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const request = await maintenanceService.updateStatus(req.params.id, status);
+    if (!request) return res.status(404).json({ message: "Maintenance Request not found" });
+    res.json(request);
+  } catch (err) {
+    if (err.message.startsWith("Invalid status transition")) {
+      return res.status(400).json({ message: err.message });
+    }
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /api/maintenance/weather-risk/:wellId
+export const getWeatherRisk = async (req, res) => {
+  try {
+    const { wellId } = req.params;
+    const result = await maintenanceService.checkWeatherRisk(wellId, req.user._id);
+    res.json(result);
+  } catch (err) {
+    if (err.message === "Well not found" || err.message === "Well has no coordinates") {
+      return res.status(400).json({ message: err.message });
+    }
+    res.status(500).json({ message: err.message });
+  }
+};
+
