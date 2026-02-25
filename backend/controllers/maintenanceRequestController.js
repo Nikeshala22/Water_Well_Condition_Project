@@ -3,7 +3,8 @@ import * as maintenanceService from "../services/maintenanceRequestService.js";
 // POST /api/maintenance
 export const create = async (req, res) => {
   try {
-    const request = await maintenanceService.createRequest(req.body);
+    const data = { ...req.body, requestedBy: req.user._id };
+    const request = await maintenanceService.createRequest(data);
     res.status(201).json(request);
   } catch (err) {
     res.status(500).json({ message: err.message });
