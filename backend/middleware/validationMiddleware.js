@@ -9,6 +9,11 @@ export const handleValidationErrors = (req, res, next) => {
 };
 
 export const validateCreateMaintenanceRequest = [
+  body("wellId")
+    .notEmpty()
+    .withMessage("wellId is required")
+    .isMongoId()
+    .withMessage("Invalid wellId format"),
   body("issueType")
     .notEmpty()
     .withMessage("Issue type is required")
