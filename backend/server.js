@@ -6,7 +6,6 @@ import connectDB from "./configs/db.js";
 import authRoutes from "./routes/authRoutes.js"; 
 import reportRoutes from "./routes/wellReportRoutes.js";
 import wellsRoutes from "./routes/wellsRoutes.js";
-import wellsRoutes from "./routes/wellsRoutes.js";
 
 //initialize express app
 const app = express()
