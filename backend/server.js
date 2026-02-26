@@ -4,8 +4,7 @@ import cors from "cors";
 import connectDB from "./configs/db.js";
 
 import authRoutes from "./routes/authRoutes.js"; 
-import reportRoutes from "./routes/wellReportRoutes.js";
-import wellsRoutes from "./routes/wellsRoutes.js";
+import waterQualityRoutes from "./routes/waterQualityRoutes.js";
 
 //initialize express app
 const app = express()
@@ -19,12 +18,7 @@ app.use(express.json());
 
 //Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/reports", reportRoutes);
-app.use("/api/wells", wellsRoutes);
-
-
-app.use("/uploads", express.static("uploads"));
-app.use("/api/wells", wellsRoutes);
+app.use("/api/water-quality", waterQualityRoutes);
 
 app.get('/', (req, res)=> res.send("Server is running"))
 
