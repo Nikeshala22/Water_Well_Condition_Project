@@ -1,8 +1,13 @@
-import axios from "axios";
-import { checkRainfall } from "../../services/weatherService.js";
+import { jest } from '@jest/globals';
 
-// Mock axios so we don't actually hit the external API during testing
-jest.mock("axios");
+jest.unstable_mockModule('axios', () => ({
+  default: {
+    get: jest.fn(),
+  },
+}));
+
+const { default: axios } = await import('axios');
+const { checkRainfall } = await import('../../services/weatherService.js');
 
 describe("Weather Service - checkRainfall", () => {
   afterEach(() => {
@@ -55,8 +60,12 @@ describe("Weather Service - checkRainfall", () => {
   });
 
   it("should throw an error if the API request fails", async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    
     axios.get.mockRejectedValueOnce(new Error("Network Error"));
 
     await expect(checkRainfall(6.9271, 79.8612)).rejects.toThrow("Could not fetch weather data");
+    
+    consoleSpy.mockRestore();
   });
 });
