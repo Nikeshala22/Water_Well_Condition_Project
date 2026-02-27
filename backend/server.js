@@ -4,10 +4,11 @@ import cors from "cors";
 import connectDB from "./configs/db.js";
 
 import authRoutes from "./routes/authRoutes.js"; 
-import waterQualityRoutes from "./routes/waterQualityRoutes.js";
-import maintenanceRequestRoutes from "./routes/maintenanceRequestRoutes.js"; 
 import reportRoutes from "./routes/wellReportRoutes.js";
 import wellsRoutes from "./routes/wellsRoutes.js";
+import waterQualityRoutes from "./routes/waterQualityRoutes.js";
+import maintenanceRequestRoutes from "./routes/maintenanceRequestRoutes.js"; 
+
 
 //initialize express app
 const app = express()
@@ -20,15 +21,15 @@ app.use(cors());
 app.use(express.json());
 
 //Routes
+app.use("/api/wells", wellsRoutes);
+app.use("/api/reports", reportRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/water-quality", waterQualityRoutes);
-app.use("/api/reports", reportRoutes);
-app.use("/api/wells", wellsRoutes);
 app.use("/api/maintenance", maintenanceRequestRoutes);
 app.use("/uploads", express.static("uploads"));
 
-// app.get('/', (req, res)=> res.send("Server is running"))
 
+// app.get('/', (req, res)=> res.send("Server is running"))
 
 
 
