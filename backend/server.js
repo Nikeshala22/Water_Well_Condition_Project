@@ -9,6 +9,7 @@ import wellsRoutes from "./routes/wellsRoutes.js";
 import waterQualityRoutes from "./routes/waterQualityRoutes.js";
 import maintenanceRequestRoutes from "./routes/maintenanceRequestRoutes.js"; 
 
+
 //initialize express app
 const app = express()
 
@@ -24,14 +25,13 @@ app.use("/api/wells", wellsRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/water-quality", waterQualityRoutes);
+app.use("/api/maintenance", maintenanceRequestRoutes);
+app.use("/uploads", express.static("uploads"));
 
 
 // app.get('/', (req, res)=> res.send("Server is running"))
 
 
-app.use("/api/maintenance", maintenanceRequestRoutes);
-
-app.use("/uploads", express.static("uploads"));
 
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 5000;
