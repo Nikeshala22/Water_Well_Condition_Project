@@ -114,7 +114,7 @@ const MaintenanceList = () => {
               to={`/maintenance/${request._id}`}
               className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full"
             >
-              <div className="p-5 flex-grow">
+              <div className="p-5 grow">
                 <div className="flex justify-between items-start mb-4">
                   <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${getPriorityColor(request.priority)}`}>
                     {request.priority} Priority

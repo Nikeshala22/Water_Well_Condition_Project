@@ -1,47 +1,47 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import api from "../api/axios";
+import axios from "axios";
 
 const AuthContext = createContext();
-
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if token exists in localStorage, decode roles (mocking real decode or /me endpoint)
-    const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
-
-    if (token && storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
-  const login = (userData, token) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
+  // Login function
+  const login = async (data) => {
+    setUser(data);
+    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem("token", data.token);
   };
 
+  // Logout function
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+  };
+
+  // ✅ Signup function
+  const signup = async (formData) => {
+    const res = await axios.post("http://localhost:5000/api/auth/signup", formData);
+    return res.data; // return backend response for frontend
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, login, logout, loading, signup }}>
+      {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  return useContext(AuthContext);
 };

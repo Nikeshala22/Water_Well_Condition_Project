@@ -177,7 +177,7 @@ const MaintenanceDetails = () => {
             </p>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex flex-col items-center justify-center min-w-[140px]">
+          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex flex-col items-center justify-center min-w-35">
             {getStatusIcon(request.status)}
             <span className="mt-2 font-semibold text-gray-900">{request.status}</span>
           </div>
