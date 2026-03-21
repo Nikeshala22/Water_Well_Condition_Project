@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
 import { useAuth } from "../context/AuthContext";
@@ -9,28 +9,31 @@ const mapContainerStyle = { width: "100%", height: "300px", borderRadius: "1rem"
 const WellDetails = () => {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   
+  // Data States
   const [well, setWell] = useState(null);
   const [labReports, setLabReports] = useState([]);
   const [maintenanceReports, setMaintenanceReports] = useState([]);
   const [fieldReports, setFieldReports] = useState([]);
   
+  // UI States
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTabState, setActiveTabState] = useState(location.state?.activeTab || "overview");
 
   const { isLoaded: isMapLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyDx-eCOnDtK41xamif2J_61AidaPIiwMz4", 
+    googleMapsApiKey: "AIzaSyDx-eCOnDtK41xamif2J_61AidaPIiwMz4", // Remember to restrict this in Google Cloud Console
   });
 
   // --- 1. Define Role Permissions ---
   const isAdmin = user?.role === 'admin';
   const isFieldOfficer = user?.role === 'field_officer';
   const isLabTester = user?.role === 'lab_tester';
-  const isCustomer = user?.role === 'customer'; // New Customer Role
+  const isCustomer = user?.role === 'customer';
 
-  // Action Permissions (Customers get none of these, making them strictly read-only)
+  // Action Permissions
   const canEditDetails = isAdmin;
   const canChangeStatus = isAdmin || isFieldOfficer;
   const canAddMaintenance = isAdmin || isFieldOfficer;
@@ -40,7 +43,6 @@ const WellDetails = () => {
   // --- 2. Determine Allowed Tabs based on Role ---
   let availableTabs = [{ id: 'overview', label: 'Overview' }];
   
-  // Admins and Customers see ALL tabs
   if (isAdmin || isCustomer) {
     availableTabs.push(
       { id: 'lab', label: 'Lab Reports' },
@@ -58,7 +60,7 @@ const WellDetails = () => {
     );
   }
 
-  // Safe tab fallback: If user tries to access a tab they don't have permission for, force them to 'overview'
+  // Safe tab fallback
   const allowedTabIds = availableTabs.map(t => t.id);
   const currentTab = allowedTabIds.includes(activeTabState) ? activeTabState : 'overview';
 
@@ -69,11 +71,11 @@ const WellDetails = () => {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
-        // 1. Always fetch Well Details
+        // 1. Fetch Well Details
         const wellRes = await axios.get(`http://localhost:5000/api/wells/id/${id}`, { headers });
         setWell(wellRes.data.data);
 
-        // 2. Fetch Lab Reports ONLY if user is Admin, Lab Tester, or Customer
+        // 2. Fetch Lab Reports
         if (isAdmin || isLabTester || isCustomer) {
           try { 
             const labRes = await axios.get(`http://localhost:5000/api/lab-reports/well/${id}`, { headers }); 
@@ -81,7 +83,7 @@ const WellDetails = () => {
           } catch (e) { console.log("Lab reports restricted or not found"); }
         }
 
-        // 3. Fetch Field & Maintenance Reports ONLY if user is Admin, Field Officer, or Customer
+        // 3. Fetch Field & Maintenance Reports
         if (isAdmin || isFieldOfficer || isCustomer) {
           try { 
             const mainRes = await axios.get(`http://localhost:5000/api/maintenance/well/${id}`, { headers }); 
@@ -90,7 +92,7 @@ const WellDetails = () => {
           
           try { 
             const fieldRes = await axios.get(`http://localhost:5000/api/field-reports/well/${id}`, { headers }); 
-            setFieldReports(fieldRes.data.data || []); 
+            setFieldReports(fieldRes.data || []); 
           } catch (e) { console.log("Field reports restricted or not found"); }
         }
 
@@ -105,7 +107,7 @@ const WellDetails = () => {
 
   // --- Handle Status Change ---
   const handleStatusChange = async (newStatus) => {
-    if (!window.confirm(`Are you sure you want to change the status to ${newStatus}?`)) return;
+    if (!window.confirm(`Are you sure you want to change the well status to ${newStatus}?`)) return;
     try {
       const token = localStorage.getItem("token");
       await axios.patch(`http://localhost:5000/api/wells/${id}/status`, 
@@ -126,13 +128,14 @@ const WellDetails = () => {
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto font-sans">
       
-      {/* Header Section */}
+      {/* ================= HEADER SECTION ================= */}
       <div className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div>
-          <Link to="/wells" className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2 mb-4 transition-colors">
+          <button onClick={() => navigate("/wells")} className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2 mb-4 transition-colors bg-transparent border-none cursor-pointer">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Back to All Wells
-          </Link>
+          </button>
+          
           <div className="flex flex-wrap items-center gap-4">
             <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">{well.name}</h1>
             
@@ -159,12 +162,10 @@ const WellDetails = () => {
                 {well.status.toUpperCase()}
               </span>
             )}
-
           </div>
           <p className="text-gray-500 mt-2 text-lg">{well.wellId} &bull; {well.village}</p>
         </div>
         
-        {/* Quick Actions */}
         <div className="flex gap-3">
           {canEditDetails && (
             <Link to={`/wells/edit/${well._id}`} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors shadow-sm flex items-center gap-2">
@@ -175,7 +176,7 @@ const WellDetails = () => {
         </div>
       </div>
 
-      {/* Dynamic Tabs Navigation */}
+      {/* ================= TABS NAVIGATION ================= */}
       <div className="flex border-b border-gray-200 mb-8 overflow-x-auto">
         {availableTabs.map(tab => (
           <button 
@@ -190,6 +191,7 @@ const WellDetails = () => {
 
       {/* ================= TAB CONTENT ================= */}
       
+      {/* 1. OVERVIEW TAB */}
       {currentTab === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
@@ -214,6 +216,7 @@ const WellDetails = () => {
         </div>
       )}
 
+      {/* 2. LAB REPORTS TAB */}
       {currentTab === "lab" && availableTabs.some(t => t.id === 'lab') && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50/50 gap-4">
@@ -259,6 +262,7 @@ const WellDetails = () => {
         </div>
       )}
 
+      {/* 3. MAINTENANCE HISTORY TAB */}
       {currentTab === "maintenance" && availableTabs.some(t => t.id === 'maintenance') && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50/50 gap-4">
@@ -270,30 +274,66 @@ const WellDetails = () => {
             )}
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-200">
+            <table className="w-full text-left border-collapse min-w-225">
               <thead>
                 <tr className="bg-white border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
-                  <th className="py-4 px-6 font-semibold">Job ID</th>
                   <th className="py-4 px-6 font-semibold">Date</th>
-                  <th className="py-4 px-6 font-semibold">Issue Description</th>
+                  <th className="py-4 px-6 font-semibold">Issue Type</th>
+                  <th className="py-4 px-6 font-semibold">Priority</th>
                   <th className="py-4 px-6 font-semibold">Status</th>
+                  <th className="py-4 px-6 font-semibold">Assigned To</th>
+                  <th className="py-4 px-6 font-semibold text-right">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {maintenanceReports.length === 0 ? (
                   <tr>
-                    <td colSpan="4" className="py-8 text-center text-gray-500">No maintenance records found.</td>
+                    <td colSpan="6" className="py-8 text-center text-gray-500">No maintenance records found.</td>
                   </tr>
                 ) : (
                   maintenanceReports.map((job) => (
                     <tr key={job._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6 font-medium text-gray-900">{job.jobId || job._id.substring(0,8)}</td>
-                      <td className="py-4 px-6 text-gray-600">{new Date(job.createdAt).toLocaleDateString()}</td>
-                      <td className="py-4 px-6 text-gray-800">{job.issueDescription || job.issue}</td>
+                      <td className="py-4 px-6 text-gray-600 font-medium">
+                        {new Date(job.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 px-6 text-gray-800 font-medium">
+                        {job.issueType ? job.issueType.replace(/([A-Z])/g, ' $1').trim() : "Unknown"}
+                      </td>
                       <td className="py-4 px-6">
-                        <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide bg-gray-100 text-gray-700">
+                        <span className={`font-bold tracking-wide
+                          ${job.priority === 'High' ? 'text-red-600' : 
+                            job.priority === 'Medium' ? 'text-yellow-600' : 
+                            'text-green-600'}`}
+                        >
+                          {job.priority || "Normal"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide
+                          ${job.status === 'Completed' ? 'bg-green-100 text-green-700' : 
+                            job.status === 'InProgress' ? 'bg-blue-100 text-blue-700' : 
+                            'bg-yellow-100 text-yellow-700'}`}
+                        >
                           {job.status || "Pending"}
                         </span>
+                      </td>
+                      <td className="py-4 px-6 text-gray-600 flex items-center mt-1">
+                        {job.assignedTo ? (
+                          <span className="flex items-center text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded-md text-sm">
+                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            {job.assignedTo.username}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 italic text-sm">Unassigned</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <Link 
+                          to={`/maintenance/${job._id}`} 
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
+                        >
+                          View Details &rarr;
+                        </Link>
                       </td>
                     </tr>
                   ))
@@ -304,6 +344,7 @@ const WellDetails = () => {
         </div>
       )}
 
+      {/* 4. FIELD REPORTS TAB */}
       {currentTab === "field" && availableTabs.some(t => t.id === 'field') && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50/50 gap-4">
@@ -315,27 +356,65 @@ const WellDetails = () => {
             )}
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-200">
+            <table className="w-full text-left border-collapse min-w-225">
               <thead>
                 <tr className="bg-white border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
-                  <th className="py-4 px-6 font-semibold">Report ID</th>
                   <th className="py-4 px-6 font-semibold">Date</th>
-                  <th className="py-4 px-6 font-semibold">Officer Name</th>
-                  <th className="py-4 px-6 font-semibold">Notes</th>
+                  <th className="py-4 px-6 font-semibold">Reported By</th>
+                  <th className="py-4 px-6 font-semibold">Water Level</th>
+                  <th className="py-4 px-6 font-semibold">Pump Status</th>
+                  <th className="py-4 px-6 font-semibold">Severity</th>
+                  <th className="py-4 px-6 font-semibold">Report Status</th>
+                  <th className="py-4 px-6 font-semibold text-right">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {fieldReports.length === 0 ? (
                   <tr>
-                    <td colSpan="4" className="py-8 text-center text-gray-500">No field reports found.</td>
+                    <td colSpan="7" className="py-8 text-center text-gray-500">No field reports found.</td>
                   </tr>
                 ) : (
                   fieldReports.map((report) => (
                     <tr key={report._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6 font-medium text-gray-900">{report.reportId || report._id.substring(0,8)}</td>
-                      <td className="py-4 px-6 text-gray-600">{new Date(report.createdAt).toLocaleDateString()}</td>
-                      <td className="py-4 px-6 text-gray-800">{report.officerName || "Unknown"}</td>
-                      <td className="py-4 px-6 text-gray-600 truncate max-w-xs">{report.notes}</td>
+                      <td className="py-4 px-6 text-gray-600 font-medium">
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 px-6 text-gray-800">
+                        {report.reportedBy?.username || "Unknown"}
+                      </td>
+                      <td className="py-4 px-6 text-gray-600">
+                        {report.waterLevel}
+                      </td>
+                      <td className="py-4 px-6 text-gray-600">
+                        {report.pumpStatus}
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className={`font-semibold 
+                          ${report.severity === 'High' ? 'text-red-600' : 
+                            report.severity === 'Medium' ? 'text-yellow-600' : 
+                            'text-green-600'}`}
+                        >
+                          {report.severity}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide
+                          ${report.status === 'resolved' ? 'bg-green-100 text-green-700' : 
+                            report.status === 'verified' ? 'bg-blue-100 text-blue-700' : 
+                            report.status === 'false' ? 'bg-red-100 text-red-700' :
+                            'bg-yellow-100 text-yellow-700'}`}
+                        >
+                          {report.status || "Submitted"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <Link 
+                          to={`/field-reports/${report._id}`} 
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
+                        >
+                          View Details &rarr;
+                        </Link>
+                      </td>
                     </tr>
                   ))
                 )}
