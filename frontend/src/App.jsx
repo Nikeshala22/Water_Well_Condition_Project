@@ -10,6 +10,9 @@ import WellsList from "./pages/WellsList";
 import AddWell from "./pages/AddWell";
 import EditWell from "./pages/EditWell";
 import WellDetails from "./pages/WellDetails";
+import MaintenanceList from './pages/MaintenanceList';
+import MaintenanceForm from './pages/MaintenanceForm';
+import MaintenanceDetails from './pages/MaintenanceDetails';
 
 function App() {
   return (
@@ -26,6 +29,10 @@ function App() {
           <Route path="/wells/add" element={<AddWell />} />
           <Route path="/wells/edit/:id" element={<EditWell />} />
           <Route path="/wells/:id" element={<WellDetails />} />
+          <Route path="/maintenance" element={<MaintenanceList />} />
+          <Route path="/maintenance/:id" element={<MaintenanceDetails />} />
+          <Route path="/maintenance/new" element={<MaintenanceForm />} />
+        
         </Routes>
       </BrowserRouter>
     </AuthProvider>

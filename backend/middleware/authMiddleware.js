@@ -42,3 +42,13 @@ export const authorizeRoles = (...roles) => {
     next();
   };
 };
+
+// fieldOfficerOnly middleware
+const fieldOfficerOnly = (req, res, next) => {
+  if (req.user && req.user.role === "field_officer") {
+    next();
+  } else {
+    res.status(403).json({ message: "Access restricted to field officers only" });
+  }
+};
+
