@@ -15,14 +15,14 @@ const router = express.Router();
 // Create well (Admin only)
 router.post("/", protect, authorizeRoles("admin"), createWell);
 
-// Get all wells (Admin, Field Officer, Visitor)
-router.get("/", protect, authorizeRoles("admin", "field_officer", "visitor"), getAllWells);
+// Get all wells (Admin, Field Officer, Lab Tester, Customer)
+router.get("/", protect, authorizeRoles("admin", "field_officer", "lab_tester", "customer"), getAllWells);
 
 // Get single well by Mongodb _id
-router.get("/id/:id", protect, authorizeRoles("admin", "field_officer", "visitor"), getWellById);
+router.get("/id/:id", protect, authorizeRoles("admin", "field_officer", "lab_tester", "customer"), getWellById);
 
 // Get Single Well by input wellId
-router.get("/wellId/:wellId", protect, authorizeRoles("admin", "field_officer", "visitor"), getWellByWellId);
+router.get("/wellId/:wellId", protect, authorizeRoles("admin", "field_officer", "lab_tester", "customer"), getWellByWellId);
 
 // Update metadata (Admin only)
 router.put("/:id", protect, authorizeRoles("admin"), updateWell);
