@@ -1,0 +1,125 @@
+import WaterQuality from '../models/WaterQuality.js';
+import mongoose from 'mongoose';
+
+const validatePayload = (payload, isPartial = false) => {
+    const errors = [];
+
+    if (!isPartial || payload.wellId !== undefined) {
+        if (!payload.wellId || !mongoose.Types.ObjectId.isValid(payload.wellId)) {
+            errors.push('wellId must be a valid ObjectId');
+        }
+    }
+
+    if (!isPartial || payload.testerName !== undefined) {
+        if (!payload.testerName || typeof payload.testerName !== 'string' || !payload.testerName.trim()) {
+            errors.push('testerName is required');
+        }
+    }
+
+    if (!isPartial || payload.phLevel !== undefined) {
+        if (typeof payload.phLevel !== 'number' || payload.phLevel < 0 || payload.phLevel > 14) {
+            errors.push('phLevel must be a number between 0 and 14');
+        }
+    }
+
+    if (!isPartial || payload.turbidity !== undefined) {
+        if (typeof payload.turbidity !== 'number' || payload.turbidity < 0) {
+            errors.push('turbidity must be a non-negative number');
+        }
+    }
+
+    if (!isPartial || payload.bacteriaCount !== undefined) {
+        if (typeof payload.bacteriaCount !== 'number' || payload.bacteriaCount < 0) {
+            errors.push('bacteriaCount must be a non-negative number');
+        }
+    }
+
+    if (!isPartial || payload.temperature !== undefined) {
+        if (typeof payload.temperature !== 'number' || payload.temperature < -20 || payload.temperature > 100) {
+            errors.push('temperature must be a number between -20 and 100');
+        }
+    }
+
+    return errors;
+};
+
+// 1. Requirement: Record Test Result 
+export const addTestResult = async (req, res) => {
+    try {
+        const errors = validatePayload(req.body);
+        if (errors.length) {
+            return res.status(400).json({ message: "Validation Error", errors });
+        }
+
+        const { phLevel, bacteriaCount, turbidity, temperature } = req.body;
+        
+        // Safety Logic 
+        let status = 'Safe';
+        if (phLevel < 6.5 || phLevel > 8.5 || bacteriaCount > 0 || turbidity > 5.0 || temperature > 35) {
+            status = 'Unsafe';
+        } else if (phLevel < 6.8 || phLevel > 8.2 || turbidity > 4.0 || temperature > 30) {
+            status = 'Warning';
+        }
+
+        const newTest = new WaterQuality({ ...req.body, status });
+        const savedTest = await newTest.save();
+        res.status(201).json(savedTest);
+    } catch (err) {
+        res.status(400).json({ message: "Validation Error", error: err.message });
+    }
+};
+
+// 2. Get History for a Specific Well
+export const getWellHistory = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.wellId)) {
+            return res.status(400).json({ message: "Validation Error", error: "Invalid wellId" });
+        }
+
+        const history = await WaterQuality.find({ wellId: req.params.wellId }).sort({ testDate: -1 });
+        res.status(200).json(history);
+    } catch (err) {
+        res.status(500).json({ message: "Fetch Error", error: err.message });
+    }
+};
+
+// 3. Update a Test Result
+export const updateTestResult = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Validation Error", error: "Invalid id" });
+        }
+
+        const errors = validatePayload(req.body, true);
+        if (errors.length) {
+            return res.status(400).json({ message: "Validation Error", errors });
+        }
+
+        const updated = await WaterQuality.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+        if (!updated) {
+            return res.status(404).json({ message: "Record not found" });
+        }
+        res.status(200).json(updated);
+    } catch (err) {
+        res.status(400).json({ message: "Update Error", error: err.message });
+    }
+};
+
+export const deleteTestResult = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Validation Error", error: "Invalid id" });
+        }
+
+        const deleted = await WaterQuality.findByIdAndDelete(req.params.id);
+        if (!deleted) {
+            return res.status(404).json({ message: "Record not found" });
+        }
+        res.status(200).json({ message: "Record deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Delete failed", error: err.message });
+    }
+};
