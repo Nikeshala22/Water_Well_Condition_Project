@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@react-google-maps/api": "^2.20.8",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.5",
     "lucide-react": "^0.575.0",
+=======
+    "@tailwindcss/vite": "^4.1.18",
+>>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0",

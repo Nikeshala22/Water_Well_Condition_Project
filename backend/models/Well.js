@@ -64,4 +64,8 @@ const wellSchema = new mongoose.Schema(
 wellSchema.index({ location: "2dsphere" });
 
 
+<<<<<<< HEAD
 export default mongoose.model("Well", wellSchema);
+=======
+export default mongoose.model("Well", wellSchema);
+>>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
