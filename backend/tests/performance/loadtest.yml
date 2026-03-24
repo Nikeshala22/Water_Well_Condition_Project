@@ -18,4 +18,4 @@ scenarios:
           url: "/api/wells"
           # Since your route is protected, you must provide a valid JWT token here
           headers:
-            Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OGIwZGYzZTQ3ODE1ODhhOTJkNmYwYyIsImlhdCI6MTc3NDA5MzI3NiwiZXhwIjoxNzc0Njk4MDc2fQ.ZKbUJ-ygyBuYAFyObd-IlbCvO1bqkEu60HRbQgi23OY"
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OGIwZGYzZTQ3ODE1ODhhOTJkNmYwYyIsImlhdCI6MTc3NDMzMzM1NCwiZXhwIjoxNzc0OTM4MTU0fQ.c0_qVqR4BWaP8oAJuzbJrdlI0faGFiPUDYEyQdoatKs"
