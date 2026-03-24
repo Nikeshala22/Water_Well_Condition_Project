@@ -13,11 +13,7 @@ export const signup = async (req, res) => {
     const exists = await User.findOne({ username });
     if (exists) return res.status(400).json({ message: "User already exists" });
 
-<<<<<<< HEAD
     const user = await User.create({ username, password, role: role || "communityUser" });
-=======
-    const user = await User.create({ username, password, role: role || "customer" });
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
 
     res.status(201).json({
       _id: user._id,
