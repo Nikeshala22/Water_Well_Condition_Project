@@ -30,6 +30,8 @@ const Login = () => {
         navigate("/field-dashboard");
       } else if (res.data.role === "lab_tester") {
         navigate("/lab-dashboard");
+      } else if (res.data.role === "customer") {
+        navigate("/home");
       } else {
         navigate("/home");
       }

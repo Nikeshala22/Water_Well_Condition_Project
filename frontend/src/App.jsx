@@ -77,7 +77,11 @@ function AppContent() {
                   <FieldOfficerDashboard />
                 </ProtectedRoute>
               } />
-
+              <Route path="/home" element={
+                <ProtectedRoute allowedRoles={["customer"]}>
+                  <HomePage />
+                </ProtectedRoute>
+              } />
               <Route path="/add-report" element={
                 <ProtectedRoute allowedRoles={["field_officer"]}>
                   <AddWellReport />

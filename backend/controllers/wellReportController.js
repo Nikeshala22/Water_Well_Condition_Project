@@ -98,16 +98,11 @@ export const getReports = async (req, res) => {
 };
 
 
-<<<<<<< HEAD
 // GET REPORTS FOR A SPECIFIC WELL (Fixed for ID mismatches)
-=======
-// GET REPORTS FOR A SPECIFIC WELL
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
 export const getReportsByWell = async (req, res) => {
   try {
     const { wellId } = req.params;
 
-<<<<<<< HEAD
     // 1. First, check if the ID passed is a MongoDB ObjectID
     // If it is, we find the Well to get its string Identifier (e.g., WELL-001)
     let searchId = wellId;
@@ -121,31 +116,19 @@ export const getReportsByWell = async (req, res) => {
     const reports = await Report.find({ 
       wellId: searchId.trim().toUpperCase() 
     })
-=======
-    const reports = await Report.find({ wellId })
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
       .populate("reportedBy", "username")
       .populate("comments.commentedBy", "username")
       .sort({ createdAt: -1 });
 
-<<<<<<< HEAD
     // 3. If no reports, return 404 so frontend catch block works
     if (!reports || reports.length === 0) {
       return res.status(404).json({
         success: false,
-=======
-    if (!reports || reports.length === 0) {
-      return res.status(404).json({
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
         message: "No reports found for this well",
       });
     }
 
-<<<<<<< HEAD
     // 4. Convert photo filenames to full URLs
-=======
-    // Convert photo filenames to full URLs
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     const updatedReports = reports.map(report => {
       const reportObj = report.toObject();
 
@@ -156,7 +139,6 @@ export const getReportsByWell = async (req, res) => {
       return reportObj;
     });
 
-<<<<<<< HEAD
     res.status(200).json({
       success: true,
       data: updatedReports
@@ -165,12 +147,6 @@ export const getReportsByWell = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-=======
-    res.status(200).json(updatedReports);
-
-  } catch (error) {
-    res.status(500).json({
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
       message: error.message,
     });
   }
@@ -367,42 +343,25 @@ export const getWellComments = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-<<<<<<< HEAD
 // UPDATE COMMENT - FIXED FOR ROLE-BASED ACCESS
-=======
-// UPDATE COMMENT
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
 export const updateComment = async (req, res) => {
   try {
     const { reportId, commentId } = req.params;
     const { message } = req.body;
 
-<<<<<<< HEAD
     // 1. Find the report WITHOUT populating the comment author yet
     const report = await Report.findById(reportId);
-=======
-    // Find the report
-    const report = await Report.findById(reportId).populate(
-      "comments.commentedBy",
-      "username"
-    );
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
 
     if (!report) {
       return res.status(404).json({ message: "Report not found" });
     }
 
-<<<<<<< HEAD
     // 2. Find the specific comment
-=======
-    // Find the comment
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     const comment = report.comments.id(commentId);
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-<<<<<<< HEAD
     // 3. AUTHORIZATION logic: Allow ANY admin or field_officer
     const allowedRoles = ["admin", "field_officer"];
     
@@ -413,14 +372,6 @@ export const updateComment = async (req, res) => {
     }
 
     // 4. Update and Save
-=======
-    // Check if the logged-in user is the author
-    if (comment.commentedBy._id.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You can only update your own comments" });
-    }
-
-    // Update the message
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     comment.message = message;
     await report.save();
 
@@ -438,28 +389,17 @@ export const deleteComment = async (req, res) => {
   try {
     const { reportId, commentId } = req.params;
 
-<<<<<<< HEAD
-=======
-    // Find the report
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     const report = await Report.findById(reportId);
 
     if (!report) {
       return res.status(404).json({ message: "Report not found" });
     }
 
-<<<<<<< HEAD
     const comment = report.comments.id(commentId);
-=======
-    // Find the comment index
-    const comment = report.comments.id(commentId);
-
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-<<<<<<< HEAD
     // --- NEW AUTHORIZATION LOGIC ---
     const allowedRoles = ["admin", "field_officer"];
     
@@ -467,27 +407,14 @@ export const deleteComment = async (req, res) => {
       return res.status(403).json({ 
         message: "Unauthorized: Only Field Officers or Admins can delete comments" 
       });
-=======
-    // Check if logged-in user is the author or admin
-    if (comment.commentedBy.toString() !== req.user.id && req.user.role !== "admin") {
-      return res.status(403).json({ message: "You can only delete your own comments" });
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     }
 
     // Remove the comment using pull
     report.comments.pull({ _id: commentId });
-<<<<<<< HEAD
-=======
-
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
     await report.save();
 
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> d9eb8a1aa76b90a7c345679610793cb082767644
