@@ -7,13 +7,9 @@
   "scripts": {
     "server": "nodemon server.js",
     "start": "node server.js",
-<<<<<<< HEAD
-    "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js"
-=======
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --passWithNoTests",
     "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",
     "test:coverage": "cross-env NODE_ENV=test jest --coverage"
->>>>>>> feature/Well-Condition-Reports
   },
   "keywords": [],
   "author": "",
@@ -32,12 +28,9 @@
     "something": "^0.0.1"
   },
   "devDependencies": {
-<<<<<<< HEAD
-=======
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.2",
     "babel-jest": "^30.3.0",
->>>>>>> feature/Well-Condition-Reports
     "cross-env": "^10.1.0",
     "jest": "^30.3.0",
     "mongodb-memory-server": "^8.12.1",
