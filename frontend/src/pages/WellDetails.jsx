@@ -25,17 +25,20 @@ const WellDetails = () => {
     googleMapsApiKey: "AIzaSyDx-eCOnDtK41xamif2J_61AidaPIiwMz4", 
   });
 
+  // --- ROLE PERMISSIONS ---
   const isAdmin = user?.role === 'admin';
   const isFieldOfficer = user?.role === 'field_officer';
   const isLabTester = user?.role === 'lab_tester';
   const isCustomer = user?.role === 'customer';
 
+  // Action Permissions (Customers CANNOT edit or add)
   const canEditDetails = isAdmin;
   const canChangeStatus = isAdmin || isFieldOfficer;
   const canAddMaintenance = isAdmin || isFieldOfficer;
   const canAddFieldReport = isAdmin || isFieldOfficer;
   const canAddLabReport = isAdmin || isLabTester;
 
+  // --- TAB VISIBILITY ---
   let availableTabs = [{ id: 'overview', label: 'Overview' }];
   
   if (isAdmin || isCustomer) {
@@ -72,7 +75,7 @@ const WellDetails = () => {
           try { 
             const labRes = await axios.get(`http://localhost:5000/api/lab-reports/well/${id}`, { headers }); 
             setLabReports(labRes.data.data || labRes.data || []); 
-          } catch (e) { console.log("Lab reports error"); }
+          } catch (e) { console.log("Lab reports restricted or not found"); }
         }
 
         // 3. Maintenance & Field Reports
@@ -80,29 +83,22 @@ const WellDetails = () => {
           try { 
             const mainRes = await axios.get(`http://localhost:5000/api/maintenance/well/${id}`, { headers }); 
             setMaintenanceReports(mainRes.data.data || mainRes.data || []); 
-          } catch (e) { console.log("Maintenance reports error"); }
+          } catch (e) { console.log("Maintenance reports restricted or not found"); }
           
           try { 
-  // IMPORTANT: Verify if your backend expects the MongoDB _id or the String WellId
-  // If your route uses Report.find({ wellId: req.params.wellId }), make sure you are sending well.wellId
-  const fieldRes = await axios.get(`http://localhost:5000/api/reports/well/${id}`, { headers }); 
-  
-  console.log("Full API Response:", fieldRes); // Debugging line
-
-  const fetchedReports = fieldRes.data.data || fieldRes.data || [];
-  
-  if (Array.isArray(fetchedReports)) {
-    setFieldReports(fetchedReports);
-  } else {
-    // If backend returns a single object instead of array
-    setFieldReports([fetchedReports]);
-  }
-} catch (e) { 
-  console.error("Field reports connection failed:", e.response?.status, e.message);
-  setFieldReports([]); 
-}
+            // --- UPDATED API FETCH LOGIC ---
+            const fieldRes = await axios.get(`http://localhost:5000/api/reports/well/${id}`, { headers }); 
+            
+            // Since your controller sends { success: true, data: updatedReports }, we need .data.data
+            const fetchedReports = fieldRes.data.data || [];
+            
+            setFieldReports(Array.isArray(fetchedReports) ? fetchedReports : []);
+          } catch (e) { 
+            // If the backend returns 404 (No reports found), we set to empty array instead of failing
+            console.log("No reports found for this well");
+            setFieldReports([]); 
+          }
         }
-
       } catch (err) {
         setError("Failed to load well details.");
       } finally {
@@ -151,18 +147,20 @@ const WellDetails = () => {
           <p className="text-gray-500 mt-2 text-lg">{well.wellId} &bull; {well.village}</p>
         </div>
         {canEditDetails && (
-          <Link to={`/wells/edit/${well._id}`} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors shadow-sm flex items-center gap-2">Edit Details</Link>
+          <Link to={`/wells/edit/${well._id}`} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium shadow-sm flex items-center gap-2">Edit Details</Link>
         )}
       </div>
 
-      {/* TABS */}
+      {/* TABS NAVIGATION */}
       <div className="flex border-b border-gray-200 mb-8 overflow-x-auto">
         {availableTabs.map(tab => (
-          <button key={tab.id} onClick={() => setActiveTabState(tab.id)} className={`py-4 px-6 md:px-8 font-semibold text-sm transition-colors border-b-2 whitespace-nowrap capitalize ${currentTab === tab.id ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}>{tab.label}</button>
+          <button key={tab.id} onClick={() => setActiveTabState(tab.id)} className={`py-4 px-6 md:px-8 font-semibold text-sm transition-colors border-b-2 whitespace-nowrap capitalize ${currentTab === tab.id ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
+            {tab.label}
+          </button>
         ))}
       </div>
 
-      {/* CONTENT */}
+      {/* OVERVIEW TAB */}
       {currentTab === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
@@ -184,6 +182,7 @@ const WellDetails = () => {
         </div>
       )}
 
+      {/* LAB REPORTS TAB */}
       {currentTab === "lab" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -198,7 +197,7 @@ const WellDetails = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {labReports.length === 0 ? <tr><td colSpan="4" className="py-8 text-center">No reports.</td></tr> :
+                {labReports.length === 0 ? <tr><td colSpan="4" className="py-8 text-center text-gray-500">No lab reports found.</td></tr> :
                   labReports.map(r => (
                     <tr key={r._id} className="hover:bg-gray-50">
                       <td className="py-4 px-6 font-medium">{r.reportId || r._id.substring(0,8)}</td>
@@ -213,6 +212,7 @@ const WellDetails = () => {
         </div>
       )}
 
+      {/* MAINTENANCE HISTORY TAB */}
       {currentTab === "maintenance" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -223,7 +223,7 @@ const WellDetails = () => {
             <table className="w-full text-left border-collapse min-w-225">
               <thead>
                 <tr className="bg-white border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
-                  <th className="py-4 px-6 font-semibold">Date</th><th className="py-4 px-6 font-semibold">Issue Type</th><th className="py-4 px-6 font-semibold">Priority</th><th className="py-4 px-6 font-semibold">Status</th><th className="py-4 px-6 font-semibold text-right">Details</th>
+                  <th className="py-4 px-6 font-semibold">Date</th><th className="py-4 px-6 font-semibold">Issue Type</th><th className="py-4 px-6 font-semibold">Priority</th><th className="py-4 px-6 font-semibold">Status</th><th className="py-4 px-6 text-right">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -243,13 +243,12 @@ const WellDetails = () => {
         </div>
       )}
 
+      {/* FIELD REPORTS TAB */}
       {currentTab === "field" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <h3 className="text-lg font-bold text-gray-900">Field Officer Reports</h3>
-            {canAddFieldReport && (
-              <Link to="/add-report" className="text-sm font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg transition-colors">+ Add Field Report</Link>
-            )}
+            {canAddFieldReport && <Link to="/add-report" className="text-sm font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg transition-colors">+ Add Field Report</Link>}
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-225">
@@ -260,13 +259,11 @@ const WellDetails = () => {
                   <th className="py-4 px-6 font-semibold">Water Level</th>
                   <th className="py-4 px-6 font-semibold">Pump Status</th>
                   <th className="py-4 px-6 font-semibold">Severity</th>
-                  <th className="py-4 px-6 font-semibold text-right">Details</th>
+                  <th className="py-4 px-6 text-right">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {fieldReports.length === 0 ? (
-                  <tr><td colSpan="6" className="py-8 text-center text-gray-500">No field reports found.</td></tr>
-                ) : (
+                {fieldReports.length === 0 ? <tr><td colSpan="6" className="py-8 text-center text-gray-500">No field reports found.</td></tr> :
                   fieldReports.map((report) => (
                     <tr key={report._id} className="hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-6 text-gray-600 font-medium">{new Date(report.createdAt).toLocaleDateString()}</td>
@@ -282,8 +279,7 @@ const WellDetails = () => {
                         <Link to={`/reports/${report._id}`} className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">View Details &rarr;</Link>
                       </td>
                     </tr>
-                  ))
-                )}
+                  ))}
               </tbody>
             </table>
           </div>
