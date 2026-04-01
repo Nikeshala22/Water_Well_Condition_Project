@@ -15,8 +15,9 @@ import {
   deleteReport
 } from "../controllers/wellReportController.js";
 
-// Import your flexible middleware
-import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
+// --- MIDDLEWARE IMPORTS ---
+import { protect } from "../middleware/authMiddleware.js"; // Handles JWT Token
+import { allowRoles } from "../middleware/roleMiddleware.js"; // Handles Role Authorization
 
 const router = express.Router();
 
@@ -31,19 +32,18 @@ const validate = (req, res, next) => {
 
 // 2. ROUTES
 
-// --- GET ROUTES (Both Admin & Field Officer can view) ---
-// We use authorizeRoles("admin", "field_officer") to allow both.
-router.get("/", protect, authorizeRoles("admin", "field_officer"), getReports);
-router.get("/well/:wellId", protect, authorizeRoles("admin", "field_officer"), getReportsByWell);
-router.get("/comments/all", protect, authorizeRoles("admin", "field_officer"), getAllComments);
-router.get("/comments/well/:wellId", protect, authorizeRoles("admin", "field_officer"), getWellComments);
-router.get("/:id", protect, authorizeRoles("admin", "field_officer"), getSingleReport);
+// --- GET ROUTES (Shared Access) ---
+router.get("/", protect, allowRoles("admin", "field_officer", "customer"), getReports);
+router.get("/well/:wellId", protect, allowRoles("admin", "field_officer", "customer"), getReportsByWell);
+router.get("/comments/all", protect, allowRoles("admin", "field_officer"), getAllComments);
+router.get("/comments/well/:wellId", protect, allowRoles("admin", "field_officer"), getWellComments);
+router.get("/:id", protect, allowRoles("admin", "field_officer", "customer"), getSingleReport);
 
-// --- POST/PUT/DELETE ROUTES (Only Field Officers can modify) ---
+// --- POST/PUT/DELETE ROUTES (Admin & Field Officer Access) ---
 router.post(
   "/",
   protect,
-  authorizeRoles("field_officer"), // Strictly for field officers
+  allowRoles("admin", "field_officer"), 
   upload.single("photo"),
   body("wellId").notEmpty().withMessage("Well ID is required"),
   body("waterLevel").isIn(["High", "Medium", "Low"]).withMessage("Invalid water level"),
@@ -56,7 +56,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  authorizeRoles("field_officer"), 
+  allowRoles("admin", "field_officer"), 
   upload.single("photo"),
   param("id").isMongoId().withMessage("Invalid report ID"),
   body("description").optional().isLength({ min: 10 }).withMessage("Description must be at least 10 characters"),
@@ -66,11 +66,11 @@ router.put(
 
 router.delete("/:id", protect, authorizeRoles("field_officer"), deleteReport);
 
-// --- COMMENT ACTIONS ---
+// --- COMMENT ACTIONS (Admin & Field Officer Access) ---
 router.post(
   "/:id/comments",
   protect,
-  authorizeRoles("field_officer"), 
+  allowRoles("admin", "field_officer"), 
   param("id").isMongoId().withMessage("Invalid report ID"),
   body("message").isLength({ min: 3 }).withMessage("Comment must be at least 3 characters"),
   validate,
@@ -80,7 +80,7 @@ router.post(
 router.put(
   "/:reportId/comments/:commentId",
   protect,
-  authorizeRoles("field_officer"), 
+  allowRoles("admin", "field_officer"), 
   param("reportId").isMongoId().withMessage("Invalid report ID"),
   param("commentId").isMongoId().withMessage("Invalid comment ID"),
   body("message").isLength({ min: 3 }).withMessage("Comment must be at least 3 characters"),
@@ -91,7 +91,7 @@ router.put(
 router.delete(
   "/:reportId/comments/:commentId",
   protect,
-  authorizeRoles("admin", "field_officer"), // Allow Admin to moderate/delete comments if needed
+  allowRoles("admin", "field_officer"), 
   param("reportId").isMongoId().withMessage("Invalid report ID"),
   param("commentId").isMongoId().withMessage("Invalid comment ID"),
   validate,

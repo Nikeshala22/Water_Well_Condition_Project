@@ -54,24 +54,24 @@ function AppContent() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <main className="flex-1 overflow-x-hidden overflow-y-auto">
             <Routes>
-              {/* Redirect logic for Root Path */}
+              {/* --- 4. REDIRECT LOGIC FOR ROOT PATH (/) --- */}
               <Route path="/" element={
                 !user ? <Login /> : 
                 user.role === "admin" ? <Navigate to="/admin" /> : 
-                <Navigate to="/officer-dashboard" />
+                user.role === "field_officer" ? <Navigate to="/officer-dashboard" /> :
+                <Navigate to="/home" />
               } />
 
               <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
               <Route path="/signup" element={<Signup />} />
               
-              {/* --- ADMIN ONLY ROUTES --- */}
+              {/* --- 5. DASHBOARD ROUTES --- */}
               <Route path="/admin" element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboard />
                 </ProtectedRoute>
               } />
 
-              {/* --- FIELD OFFICER ONLY ROUTES --- */}
               <Route path="/officer-dashboard" element={
                 <ProtectedRoute allowedRoles={["field_officer"]}>
                   <FieldOfficerDashboard />
@@ -83,52 +83,70 @@ function AppContent() {
                 </ProtectedRoute>
               } />
               <Route path="/add-report" element={
-                <ProtectedRoute allowedRoles={["field_officer"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
                   <AddWellReport />
                 </ProtectedRoute>
               } />
 
               <Route path="/update-report/:id" element={
-                <ProtectedRoute allowedRoles={["field_officer"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
                   <UpdateWellReport />
                 </ProtectedRoute>
               } />
 
               <Route path="/add-comment/:id" element={
-                <ProtectedRoute allowedRoles={["field_officer"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
                   <AddComments />
                 </ProtectedRoute>
               } />
 
-              {/* --- SHARED ROUTES (Both Admin & Officer can VIEW) --- */}
+              {/* --- 8. SHARED REPORT ROUTES --- */}
               <Route path="/reports" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer", "customer"]}>
                   <ReportsPage />
                 </ProtectedRoute>
               } />
 
               <Route path="/reports/:id" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer", "customer"]}>
                   <WellReportDetails />
                 </ProtectedRoute>
               } />
 
               <Route path="/comments" element={
-                <ProtectedRoute allowedRoles={["field_officer", "admin"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer", "customer"]}>
                   <CommentsPage />
                 </ProtectedRoute>
               } />
 
-              {/* General Navigation */}
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/wells" element={<WellsList />} />
-              <Route path="/wells/add" element={<AddWell />} />
-              <Route path="/wells/edit/:id" element={<EditWell />} />
-              <Route path="/wells/:id" element={<WellDetails />} />
+              {/* --- 9. ADMINISTRATIVE WELL MANAGEMENT --- */}
+              <Route path="/wells/add" element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AddWell />
+                </ProtectedRoute>
+              } />
               
-              <Route path="/maintenance" element={<MaintenanceList />} />
-              <Route path="/maintenance/:id" element={<MaintenanceDetails />} />
-              <Route path="/maintenance/new" element={<MaintenanceForm />} />
+              <Route path="/wells/edit/:id" element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <EditWell />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/maintenance" element={
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                  <MaintenanceList />
+                </ProtectedRoute>
+              } />
+              <Route path="/maintenance/:id" element={
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                  <MaintenanceDetails />
+                </ProtectedRoute>
+              } />
+              <Route path="/maintenance/new" element={
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                  <MaintenanceForm />
+                </ProtectedRoute>
+              } />
 
               {/* 404 Catch-all */}
               <Route path="*" element={<Navigate to="/" />} />

@@ -24,17 +24,20 @@ const Login = () => {
 
       setError("");
 
+      // --- Updated Navigation Logic ---
       if (res.data.role === "admin") {
         navigate("/admin");
       } else if (res.data.role === "field_officer") {
-        navigate("/field-dashboard");
+        navigate("/officer-dashboard");
       } else if (res.data.role === "lab_tester") {
         navigate("/lab-dashboard");
       } else if (res.data.role === "customer") {
         navigate("/home");
       } else {
+        // Customers and default users go to Home
         navigate("/home");
       }
+      
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }
