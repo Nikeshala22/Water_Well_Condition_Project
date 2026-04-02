@@ -1,34 +1,33 @@
-import { jest } from '@jest/globals';
-import { getAllWells } from '../../controllers/wellsController.js';
-import Well from '../../models/Well.js';
+import { jest } from "@jest/globals";
+import { getAllWells } from "../../controllers/wellsController.js";
+import Well from "../../models/Well.js";
 
-describe('Wells Controller Unit Tests', () => {
+describe("Wells Controller Unit Tests", () => {
   let req, res;
 
   beforeEach(() => {
-    // Setup fake request and response objects before each test
-    req = { body: {}, query: {}, params: {} };
+    req = {
+      body: {},
+      query: {},
+      params: {},
+    };
+
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
-    // Clear all spies/mocks between tests so they don't leak
-    jest.restoreAllMocks(); 
+
+    jest.restoreAllMocks();
   });
 
-  describe('getAllWells', () => {
-    it('should return 200 and a list of wells', async () => {
-      // 1. Setup mock database response using spyOn
-      const mockWells = [{ wellId: 'WELL-001', name: 'Test Well' }];
-      
-      // Instead of mocking the whole file, we SPY on the 'find' method 
-      // and force it to return our fake data!
-      jest.spyOn(Well, 'find').mockResolvedValue(mockWells);
+  describe("getAllWells", () => {
+    it("should return 200 and a list of wells", async () => {
+      const mockWells = [{ wellId: "WELL-001", name: "Test Well" }];
 
-      // 2. Execute function
+      jest.spyOn(Well, "find").mockResolvedValue(mockWells);
+
       await getAllWells(req, res);
 
-      // 3. Assertions
       expect(Well.find).toHaveBeenCalledWith({ isArchived: false });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -38,14 +37,50 @@ describe('Wells Controller Unit Tests', () => {
       });
     });
 
-    it('should handle database errors gracefully', async () => {
-      // Force the database to throw an error
-      jest.spyOn(Well, 'find').mockRejectedValue(new Error('Database failed'));
+    it("should handle database errors gracefully", async () => {
+      jest.spyOn(Well, "find").mockRejectedValue(new Error("Database failed"));
 
       await getAllWells(req, res);
 
+      expect(Well.find).toHaveBeenCalledWith({ isArchived: false });
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Database failed' });
+      expect(res.json).toHaveBeenCalledWith({ message: "Database failed" });
+    });
+
+
+    it("should filter wells by status", async () => {
+      req.query.status = "Active";
+
+      const mockWells = [{ wellId: "WELL-003", name: "Active Well", status: "Active" }];
+
+      jest.spyOn(Well, "find").mockResolvedValue(mockWells);
+
+      await getAllWells(req, res);
+
+      expect(Well.find).toHaveBeenCalledWith({
+        isArchived: false,
+        status: "Active",
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 1,
+        data: mockWells,
+      });
+    });
+
+    it("should return empty array when no wells are found", async () => {
+      jest.spyOn(Well, "find").mockResolvedValue([]);
+
+      await getAllWells(req, res);
+
+      expect(Well.find).toHaveBeenCalledWith({ isArchived: false });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 0,
+        data: [],
+      });
     });
   });
 });
