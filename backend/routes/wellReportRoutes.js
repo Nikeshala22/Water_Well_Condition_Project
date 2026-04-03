@@ -16,7 +16,7 @@ import {
 } from "../controllers/wellReportController.js";
 
 // --- MIDDLEWARE IMPORTS ---
-import { protect } from "../middleware/authMiddleware.js"; // Handles JWT Token
+import { protect, authorizeRoles } from "../middleware/authMiddleware.js"; // Handles JWT Token
 import { allowRoles } from "../middleware/roleMiddleware.js"; // Handles Role Authorization
 
 const router = express.Router();
