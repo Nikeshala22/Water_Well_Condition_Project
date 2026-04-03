@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import NavBar from "./components/NavBar";
-import FieldOfficerSidebar from "./components/FieldOfficerSidebar"; 
+import FieldOfficerSidebar from "./components/FieldOfficerSidebar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
@@ -56,21 +56,25 @@ function AppContent() {
             <Routes>
               {/* --- 4. REDIRECT LOGIC FOR ROOT PATH (/) --- */}
               <Route path="/" element={
-                !user ? <Login /> : 
-                user.role === "admin" ? <Navigate to="/admin" /> : 
-                user.role === "field_officer" ? <Navigate to="/officer-dashboard" /> :
-                <Navigate to="/home" />
+                !user ? <Login /> :
+                  user.role === "admin" ? <Navigate to="/admin" /> :
+                    user.role === "field_officer" ? <Navigate to="/officer-dashboard" /> :
+                      <Navigate to="/home" />
               } />
 
               <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
               <Route path="/signup" element={<Signup />} />
-              
+
               {/* --- 5. DASHBOARD ROUTES --- */}
               <Route path="/admin" element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/wells" element={<WellsList />} />
+              <Route path="/wells/add" element={<AddWell />} />
+              <Route path="/wells/edit/:id" element={<EditWell />} />
+              <Route path="/wells/:id" element={<WellDetails />} />
 
               <Route path="/officer-dashboard" element={
                 <ProtectedRoute allowedRoles={["field_officer"]}>
@@ -125,13 +129,13 @@ function AppContent() {
                   <AddWell />
                 </ProtectedRoute>
               } />
-              
+
               <Route path="/wells/edit/:id" element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <EditWell />
                 </ProtectedRoute>
               } />
-              
+
               <Route path="/maintenance" element={
                 <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
                   <MaintenanceList />
