@@ -98,23 +98,54 @@ export const getReports = async (req, res) => {
 };
 
 
+<<<<<<< HEAD
 // GET REPORTS FOR A SPECIFIC WELL
+=======
+// GET REPORTS FOR A SPECIFIC WELL (Fixed for ID mismatches)
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
 export const getReportsByWell = async (req, res) => {
   try {
     const { wellId } = req.params;
 
+<<<<<<< HEAD
     const reports = await Report.find({ wellId })
+=======
+    // 1. First, check if the ID passed is a MongoDB ObjectID
+    // If it is, we find the Well to get its string Identifier (e.g., WELL-001)
+    let searchId = wellId;
+    const wellDoc = await Well.findById(wellId).catch(() => null);
+    
+    if (wellDoc) {
+      searchId = wellDoc.wellId; // Use "WELL-001" instead of the long hex ID
+    }
+
+    // 2. Find reports using the normalized ID
+    const reports = await Report.find({ 
+      wellId: searchId.trim().toUpperCase() 
+    })
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
       .populate("reportedBy", "username")
       .populate("comments.commentedBy", "username")
       .sort({ createdAt: -1 });
 
+<<<<<<< HEAD
     if (!reports || reports.length === 0) {
       return res.status(404).json({
+=======
+    // 3. If no reports, return 404 so frontend catch block works
+    if (!reports || reports.length === 0) {
+      return res.status(404).json({
+        success: false,
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
         message: "No reports found for this well",
       });
     }
 
+<<<<<<< HEAD
     // Convert photo filenames to full URLs
+=======
+    // 4. Convert photo filenames to full URLs
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
     const updatedReports = reports.map(report => {
       const reportObj = report.toObject();
 
@@ -125,10 +156,21 @@ export const getReportsByWell = async (req, res) => {
       return reportObj;
     });
 
+<<<<<<< HEAD
     res.status(200).json(updatedReports);
 
   } catch (error) {
     res.status(500).json({
+=======
+    res.status(200).json({
+      success: true,
+      data: updatedReports
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
       message: error.message,
     });
   }
@@ -325,34 +367,60 @@ export const getWellComments = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+<<<<<<< HEAD
 // UPDATE COMMENT
+=======
+// UPDATE COMMENT - FIXED FOR ROLE-BASED ACCESS
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
 export const updateComment = async (req, res) => {
   try {
     const { reportId, commentId } = req.params;
     const { message } = req.body;
 
+<<<<<<< HEAD
     // Find the report
     const report = await Report.findById(reportId).populate(
       "comments.commentedBy",
       "username"
     );
+=======
+    // 1. Find the report WITHOUT populating the comment author yet
+    const report = await Report.findById(reportId);
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
 
     if (!report) {
       return res.status(404).json({ message: "Report not found" });
     }
 
+<<<<<<< HEAD
     // Find the comment
+=======
+    // 2. Find the specific comment
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
     const comment = report.comments.id(commentId);
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
 
+<<<<<<< HEAD
     // Check if the logged-in user is the author
     if (comment.commentedBy._id.toString() !== req.user.id) {
       return res.status(403).json({ message: "You can only update your own comments" });
     }
 
     // Update the message
+=======
+    // 3. AUTHORIZATION logic: Allow ANY admin or field_officer
+    const allowedRoles = ["admin", "field_officer"];
+    
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        message: "Access Denied: You do not have permission to edit logs." 
+      });
+    }
+
+    // 4. Update and Save
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
     comment.message = message;
     await report.save();
 
@@ -370,32 +438,56 @@ export const deleteComment = async (req, res) => {
   try {
     const { reportId, commentId } = req.params;
 
+<<<<<<< HEAD
     // Find the report
+=======
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
     const report = await Report.findById(reportId);
 
     if (!report) {
       return res.status(404).json({ message: "Report not found" });
     }
 
+<<<<<<< HEAD
     // Find the comment index
     const comment = report.comments.id(commentId);
 
+=======
+    const comment = report.comments.id(commentId);
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
 
+<<<<<<< HEAD
     // Check if logged-in user is the author or admin
     if (comment.commentedBy.toString() !== req.user.id && req.user.role !== "admin") {
       return res.status(403).json({ message: "You can only delete your own comments" });
+=======
+    // --- NEW AUTHORIZATION LOGIC ---
+    const allowedRoles = ["admin", "field_officer"];
+    
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        message: "Unauthorized: Only Field Officers or Admins can delete comments" 
+      });
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
     }
 
     // Remove the comment using pull
     report.comments.pull({ _id: commentId });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
     await report.save();
 
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)

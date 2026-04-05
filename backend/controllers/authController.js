@@ -13,7 +13,11 @@ export const signup = async (req, res) => {
     const exists = await User.findOne({ username });
     if (exists) return res.status(400).json({ message: "User already exists" });
 
+<<<<<<< HEAD
     const user = await User.create({ username, password, role: role || "customer" });
+=======
+    const user = await User.create({ username, password, role: role || "communityUser" });
+>>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
 
     res.status(201).json({
       _id: user._id,
