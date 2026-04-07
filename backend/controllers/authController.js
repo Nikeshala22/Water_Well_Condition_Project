@@ -13,11 +13,7 @@ export const signup = async (req, res) => {
     const exists = await User.findOne({ username });
     if (exists) return res.status(400).json({ message: "User already exists" });
 
-<<<<<<< HEAD
-    const user = await User.create({ username, password, role: role || "customer" });
-=======
     const user = await User.create({ username, password, role: role || "communityUser" });
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
 
     res.status(201).json({
       _id: user._id,
@@ -34,9 +30,11 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const { username, password } = req.body;
 
+  console.log("Login attempt:",req.body);
+
   try {
     const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) return res.status(400).json({ message: "Invalid User Name" });
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });

@@ -53,7 +53,6 @@ const NavBar = () => {
                       <NavLink to="/admin" className={linkClass}>Admin Panel</NavLink>
                       <NavLink to="/wells" className={linkClass}>Manage Wells</NavLink>
                       <NavLink to="/reports" className={linkClass}>All Reports</NavLink>
-                      <NavLink to="/water-quality" className={linkClass}>Water Quality</NavLink>
                       <NavLink to="/lab-reports" className={linkClass}>Lab Sync</NavLink>
                     </>
                   )}
@@ -63,10 +62,17 @@ const NavBar = () => {
                     <>
                       <NavLink to="/field-dashboard" className={linkClass}>Dashboard</NavLink>
                       <NavLink to="/reports" className={linkClass}>Reports</NavLink>
-                      <NavLink to="/water-quality" className={linkClass}>Water Quality</NavLink>
                       <NavLink to="/maintenance" className={linkClass}>Maintenance</NavLink>
                     </>
                   )}
+
+                  {/* LAB TESTER LINKS */}
+                  {user.role === "lab_tester" && (
+                    <>
+                      <NavLink to="/lab-dashboard" className={linkClass}>Lab Dashboard</NavLink>
+                      <NavLink to="/water-quality" className={linkClass}>Water Tests</NavLink>
+                       </>
+                      )}
                 </div>
 
                 {/* User Profile & Logout Section */}
@@ -111,20 +117,27 @@ const NavBar = () => {
           {user ? (
             <>
               {user.role === "admin" ? (
-                <>
-                  <NavLink to="/admin" onClick={toggleMenu} className={mobileLinkClass}>Admin Panel</NavLink>
-                  <NavLink to="/wells" onClick={toggleMenu} className={mobileLinkClass}>Wells</NavLink>
-                  <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>Reports</NavLink>
-                  <NavLink to="/water-quality" onClick={toggleMenu} className={mobileLinkClass}>Water Quality</NavLink>
-                </>
-              ) : (
-                <>
-                  <NavLink to="/field-dashboard" onClick={toggleMenu} className={mobileLinkClass}>Dashboard</NavLink>
-                  <NavLink to="/add-report" onClick={toggleMenu} className={mobileLinkClass}>Add New Report</NavLink>
-                  <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>History</NavLink>
-                  <NavLink to="/water-quality" onClick={toggleMenu} className={mobileLinkClass}>Water Quality</NavLink>
-                </>
-              )}
+  <>
+    <NavLink to="/admin" onClick={toggleMenu} className={mobileLinkClass}>Admin Panel</NavLink>
+    <NavLink to="/wells" onClick={toggleMenu} className={mobileLinkClass}>Wells</NavLink>
+    <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>Reports</NavLink>
+  </>
+) : user.role === "field_officer" ? (
+  <>
+    <NavLink to="/field-dashboard" onClick={toggleMenu} className={mobileLinkClass}>Dashboard</NavLink>
+    <NavLink to="/add-report" onClick={toggleMenu} className={mobileLinkClass}>Add New Report</NavLink>
+    <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>History</NavLink>
+  </>
+) : user.role === "lab_tester" ? (
+  <>
+    <NavLink to="/lab-dashboard" onClick={toggleMenu} className={mobileLinkClass}>
+      Lab Dashboard
+    </NavLink>
+    <NavLink to="/water-quality" onClick={toggleMenu} className={mobileLinkClass}>
+      Water Tests
+    </NavLink>
+  </>
+) : null}
               <button onClick={logout} className="w-full mt-4 text-white bg-slate-900 py-3 rounded-xl font-bold uppercase tracking-widest text-xs">Logout Session</button>
             </>
           ) : (

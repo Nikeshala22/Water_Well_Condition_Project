@@ -1,6 +1,8 @@
 import express from 'express';
 import { 
-    addTestResult, 
+    addTestResult,
+    getAllTests,
+    getTestById,
     getWellHistory, 
     updateTestResult, 
     deleteTestResult 
@@ -9,8 +11,10 @@ import {
 const router = express.Router();
 
 // Defined routes for Water Quality Monitoring
-router.post('/', addTestResult);
+router.get('/', getAllTests);
 router.get('/well/:wellId', getWellHistory);
+router.get('/:id', getTestById);
+router.post('/', addTestResult);
 router.put('/:id', updateTestResult);
 router.delete('/:id', deleteTestResult);
 

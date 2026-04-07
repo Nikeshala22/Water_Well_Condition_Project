@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-import React from 'react'
-
-const App = () => {
-  return (
-    <div>
-      <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1>
-    </div>
-  )
-}
-
-export default App
-=======
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import NavBar from "./components/NavBar";
@@ -38,7 +23,9 @@ import AddComments from "./pages/AddComments";
 import WellReportDetails from "./pages/WellReportDetails";
 import UpdateWellReport from "./pages/UpdateWellReport";
 import CommentsPage from "./pages/CommentsPage";
-import WaterQualityMonitoring from "./pages/WaterQualityMonitoring";
+import LabTesterDashboard from "./pages/LabTesterDashboard";
+import WaterQuality from "./pages/WaterQuality";
+import EditWaterTest from "./pages/EditWaterTest";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -72,9 +59,12 @@ function AppContent() {
             <Routes>
               {/* Redirect logic for Root Path */}
               <Route path="/" element={
-                !user ? <Login /> : 
-                user.role === "admin" ? <Navigate to="/admin" /> : 
-                <Navigate to="/officer-dashboard" />
+                !user ? <Login /> :
+                user.role === "admin" ? <Navigate to="/admin" /> :
+                user.role === "field_officer" ? <Navigate to="/officer-dashboard" /> :
+                user.role === "lab_tester" ? <Navigate to="/lab-dashboard" /> :
+                user.role === "customer" ? <Navigate to="/home" /> :
+                <Navigate to="/home" />
               } />
 
               <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
@@ -129,12 +119,6 @@ function AppContent() {
                 </ProtectedRoute>
               } />
 
-              <Route path="/water-quality" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer", "lab_tester"]}>
-                  <WaterQualityMonitoring />
-                </ProtectedRoute>
-              } />
-
               <Route path="/comments" element={
                 <ProtectedRoute allowedRoles={["field_officer", "admin"]}>
                   <CommentsPage />
@@ -151,6 +135,22 @@ function AppContent() {
               <Route path="/maintenance" element={<MaintenanceList />} />
               <Route path="/maintenance/:id" element={<MaintenanceDetails />} />
               <Route path="/maintenance/new" element={<MaintenanceForm />} />
+
+              <Route path="/water-quality" element={
+                <ProtectedRoute allowedRoles={["lab_tester"]}>
+                  <WaterQuality />
+                </ProtectedRoute>
+              } />
+              <Route path="/lab-dashboard" element={
+                <ProtectedRoute allowedRoles={["lab_tester"]}>
+                  <LabTesterDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/water-quality/edit/:id" element={
+                <ProtectedRoute allowedRoles={["lab_tester"]}>
+                  <EditWaterTest />
+                </ProtectedRoute>
+              } />
 
               {/* 404 Catch-all */}
               <Route path="*" element={<Navigate to="/" />} />
@@ -170,5 +170,4 @@ function App() {
   );
 }
 
-export default App;
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
+export default App

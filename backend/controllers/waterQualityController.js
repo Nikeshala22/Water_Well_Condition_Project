@@ -1,6 +1,4 @@
 import WaterQuality from '../models/WaterQuality.js';
-<<<<<<< HEAD
-=======
 import mongoose from 'mongoose';
 
 const validatePayload = (payload, isPartial = false) => {
@@ -44,19 +42,20 @@ const validatePayload = (payload, isPartial = false) => {
 
     return errors;
 };
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
+
+const computeTestStatus = ({ phLevel, bacteriaCount, turbidity, temperature }) => {
+    let status = 'Safe';
+    if (phLevel < 6.5 || phLevel > 8.5 || bacteriaCount > 0 || turbidity > 5.0 || temperature > 35) {
+        status = 'Unsafe';
+    } else if (phLevel < 6.8 || phLevel > 8.2 || turbidity > 4.0 || temperature > 30) {
+        status = 'Warning';
+    }
+    return status;
+};
 
 // 1. Requirement: Record Test Result 
 export const addTestResult = async (req, res) => {
     try {
-<<<<<<< HEAD
-=======
-        const errors = validatePayload(req.body);
-        if (errors.length) {
-            return res.status(400).json({ message: "Validation Error", errors });
-        }
-
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
         const { phLevel, bacteriaCount, turbidity, temperature } = req.body;
         
         // Safety Logic 
@@ -75,16 +74,44 @@ export const addTestResult = async (req, res) => {
     }
 };
 
-// 2. Get History for a Specific Well
+// 2. Get All Test Results
+export const getAllTests = async (req, res) => {
+    try {
+        const tests = await WaterQuality.find()
+            .populate('wellId', 'wellId village')
+            .sort({ testDate: -1 });
+        res.status(200).json(tests);
+    } catch (err) {
+        res.status(500).json({ message: "Fetch Error", error: err.message });
+    }
+};
+
+// 3. Get a Single Test by ID
+export const getTestById = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Validation Error", error: "Invalid id" });
+        }
+
+        const test = await WaterQuality.findById(req.params.id)
+            .populate('wellId', 'wellId village');
+        if (!test) {
+            return res.status(404).json({ message: "Test not found" });
+        }
+
+        res.status(200).json(test);
+    } catch (err) {
+        res.status(500).json({ message: "Fetch Error", error: err.message });
+    }
+};
+
+// 4. Get History for a Specific Well
 export const getWellHistory = async (req, res) => {
     try {
-<<<<<<< HEAD
-=======
         if (!mongoose.Types.ObjectId.isValid(req.params.wellId)) {
             return res.status(400).json({ message: "Validation Error", error: "Invalid wellId" });
         }
 
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
         const history = await WaterQuality.find({ wellId: req.params.wellId }).sort({ testDate: -1 });
         res.status(200).json(history);
     } catch (err) {
@@ -92,12 +119,9 @@ export const getWellHistory = async (req, res) => {
     }
 };
 
-// 3. Update a Test Result
+// 5. Update a Test Result
 export const updateTestResult = async (req, res) => {
     try {
-<<<<<<< HEAD
-        const updated = await WaterQuality.findByIdAndUpdate(req.params.id, req.body, { new: true });
-=======
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: "Validation Error", error: "Invalid id" });
         }
@@ -107,14 +131,22 @@ export const updateTestResult = async (req, res) => {
             return res.status(400).json({ message: "Validation Error", errors });
         }
 
-        const updated = await WaterQuality.findByIdAndUpdate(req.params.id, req.body, {
+        const existingTest = await WaterQuality.findById(req.params.id);
+        if (!existingTest) {
+            return res.status(404).json({ message: "Record not found" });
+        }
+
+        const mergedData = {
+            ...existingTest.toObject(),
+            ...req.body,
+        };
+        mergedData.status = computeTestStatus(mergedData);
+
+        const updated = await WaterQuality.findByIdAndUpdate(req.params.id, mergedData, {
             new: true,
             runValidators: true
         });
-        if (!updated) {
-            return res.status(404).json({ message: "Record not found" });
-        }
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
+
         res.status(200).json(updated);
     } catch (err) {
         res.status(400).json({ message: "Update Error", error: err.message });
@@ -123,9 +155,6 @@ export const updateTestResult = async (req, res) => {
 
 export const deleteTestResult = async (req, res) => {
     try {
-<<<<<<< HEAD
-        await WaterQuality.findByIdAndDelete(req.params.id);
-=======
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: "Validation Error", error: "Invalid id" });
         }
@@ -134,7 +163,6 @@ export const deleteTestResult = async (req, res) => {
         if (!deleted) {
             return res.status(404).json({ message: "Record not found" });
         }
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
         res.status(200).json({ message: "Record deleted successfully" });
     } catch (err) {
         res.status(500).json({ message: "Delete failed", error: err.message });
@@ -143,4 +171,3 @@ export const deleteTestResult = async (req, res) => {
 };
 =======
 };
->>>>>>> 9aaa432 (Add frontend and update backend for water quality monitoring)
