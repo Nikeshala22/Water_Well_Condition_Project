@@ -25,17 +25,29 @@ const WellDetails = () => {
     googleMapsApiKey: "AIzaSyDx-eCOnDtK41xamif2J_61AidaPIiwMz4", 
   });
 
+<<<<<<< HEAD
+=======
+  // --- ROLE PERMISSIONS ---
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
   const isAdmin = user?.role === 'admin';
   const isFieldOfficer = user?.role === 'field_officer';
   const isLabTester = user?.role === 'lab_tester';
   const isCustomer = user?.role === 'customer';
 
+<<<<<<< HEAD
+=======
+  // Action Permissions (Customers CANNOT edit or add)
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
   const canEditDetails = isAdmin;
   const canChangeStatus = isAdmin || isFieldOfficer;
   const canAddMaintenance = isAdmin || isFieldOfficer;
   const canAddFieldReport = isAdmin || isFieldOfficer;
   const canAddLabReport = isAdmin || isLabTester;
 
+<<<<<<< HEAD
+=======
+  // --- TAB VISIBILITY ---
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
   let availableTabs = [{ id: 'overview', label: 'Overview' }];
   
   if (isAdmin || isCustomer) {
@@ -72,7 +84,11 @@ const WellDetails = () => {
           try { 
             const labRes = await axios.get(`http://localhost:5000/api/lab-reports/well/${id}`, { headers }); 
             setLabReports(labRes.data.data || labRes.data || []); 
+<<<<<<< HEAD
           } catch (e) { console.log("Lab reports error"); }
+=======
+          } catch (e) { console.log("Lab reports restricted or not found"); }
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
         }
 
         // 3. Maintenance & Field Reports
@@ -80,6 +96,7 @@ const WellDetails = () => {
           try { 
             const mainRes = await axios.get(`http://localhost:5000/api/maintenance/well/${id}`, { headers }); 
             setMaintenanceReports(mainRes.data.data || mainRes.data || []); 
+<<<<<<< HEAD
           } catch (e) { console.log("Maintenance reports error"); }
           
           try { 
@@ -103,6 +120,24 @@ const WellDetails = () => {
 }
         }
 
+=======
+          } catch (e) { console.log("Maintenance reports restricted or not found"); }
+          
+          try { 
+            // --- UPDATED API FETCH LOGIC ---
+            const fieldRes = await axios.get(`http://localhost:5000/api/reports/well/${id}`, { headers }); 
+            
+            // Since your controller sends { success: true, data: updatedReports }, we need .data.data
+            const fetchedReports = fieldRes.data.data || [];
+            
+            setFieldReports(Array.isArray(fetchedReports) ? fetchedReports : []);
+          } catch (e) { 
+            // If the backend returns 404 (No reports found), we set to empty array instead of failing
+            console.log("No reports found for this well");
+            setFieldReports([]); 
+          }
+        }
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
       } catch (err) {
         setError("Failed to load well details.");
       } finally {
@@ -151,6 +186,7 @@ const WellDetails = () => {
           <p className="text-gray-500 mt-2 text-lg">{well.wellId} &bull; {well.village}</p>
         </div>
         {canEditDetails && (
+<<<<<<< HEAD
           <Link to={`/wells/edit/${well._id}`} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors shadow-sm flex items-center gap-2">Edit Details</Link>
         )}
       </div>
@@ -163,6 +199,22 @@ const WellDetails = () => {
       </div>
 
       {/* CONTENT */}
+=======
+          <Link to={`/wells/edit/${well._id}`} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium shadow-sm flex items-center gap-2">Edit Details</Link>
+        )}
+      </div>
+
+      {/* TABS NAVIGATION */}
+      <div className="flex border-b border-gray-200 mb-8 overflow-x-auto">
+        {availableTabs.map(tab => (
+          <button key={tab.id} onClick={() => setActiveTabState(tab.id)} className={`py-4 px-6 md:px-8 font-semibold text-sm transition-colors border-b-2 whitespace-nowrap capitalize ${currentTab === tab.id ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* OVERVIEW TAB */}
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
       {currentTab === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
@@ -184,6 +236,10 @@ const WellDetails = () => {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* LAB REPORTS TAB */}
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
       {currentTab === "lab" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -198,7 +254,11 @@ const WellDetails = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
+<<<<<<< HEAD
                 {labReports.length === 0 ? <tr><td colSpan="4" className="py-8 text-center">No reports.</td></tr> :
+=======
+                {labReports.length === 0 ? <tr><td colSpan="4" className="py-8 text-center text-gray-500">No lab reports found.</td></tr> :
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
                   labReports.map(r => (
                     <tr key={r._id} className="hover:bg-gray-50">
                       <td className="py-4 px-6 font-medium">{r.reportId || r._id.substring(0,8)}</td>
@@ -213,6 +273,10 @@ const WellDetails = () => {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* MAINTENANCE HISTORY TAB */}
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
       {currentTab === "maintenance" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -223,7 +287,11 @@ const WellDetails = () => {
             <table className="w-full text-left border-collapse min-w-225">
               <thead>
                 <tr className="bg-white border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
+<<<<<<< HEAD
                   <th className="py-4 px-6 font-semibold">Date</th><th className="py-4 px-6 font-semibold">Issue Type</th><th className="py-4 px-6 font-semibold">Priority</th><th className="py-4 px-6 font-semibold">Status</th><th className="py-4 px-6 font-semibold text-right">Details</th>
+=======
+                  <th className="py-4 px-6 font-semibold">Date</th><th className="py-4 px-6 font-semibold">Issue Type</th><th className="py-4 px-6 font-semibold">Priority</th><th className="py-4 px-6 font-semibold">Status</th><th className="py-4 px-6 text-right">Details</th>
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -243,13 +311,21 @@ const WellDetails = () => {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* FIELD REPORTS TAB */}
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
       {currentTab === "field" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <h3 className="text-lg font-bold text-gray-900">Field Officer Reports</h3>
+<<<<<<< HEAD
             {canAddFieldReport && (
               <Link to="/add-report" className="text-sm font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg transition-colors">+ Add Field Report</Link>
             )}
+=======
+            {canAddFieldReport && <Link to="/add-report" className="text-sm font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg transition-colors">+ Add Field Report</Link>}
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-225">
@@ -260,6 +336,7 @@ const WellDetails = () => {
                   <th className="py-4 px-6 font-semibold">Water Level</th>
                   <th className="py-4 px-6 font-semibold">Pump Status</th>
                   <th className="py-4 px-6 font-semibold">Severity</th>
+<<<<<<< HEAD
                   <th className="py-4 px-6 font-semibold text-right">Details</th>
                 </tr>
               </thead>
@@ -267,6 +344,13 @@ const WellDetails = () => {
                 {fieldReports.length === 0 ? (
                   <tr><td colSpan="6" className="py-8 text-center text-gray-500">No field reports found.</td></tr>
                 ) : (
+=======
+                  <th className="py-4 px-6 text-right">Details</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {fieldReports.length === 0 ? <tr><td colSpan="6" className="py-8 text-center text-gray-500">No field reports found.</td></tr> :
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
                   fieldReports.map((report) => (
                     <tr key={report._id} className="hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-6 text-gray-600 font-medium">{new Date(report.createdAt).toLocaleDateString()}</td>
@@ -282,8 +366,12 @@ const WellDetails = () => {
                         <Link to={`/reports/${report._id}`} className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">View Details &rarr;</Link>
                       </td>
                     </tr>
+<<<<<<< HEAD
                   ))
                 )}
+=======
+                  ))}
+>>>>>>> f5abe84359b50ec7a3eb750cabdd8d493c2109ab
               </tbody>
             </table>
           </div>
