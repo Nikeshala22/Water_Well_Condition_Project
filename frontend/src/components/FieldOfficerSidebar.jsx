@@ -26,6 +26,9 @@ const FieldOfficerSidebar = () => {
         <NavLink to="/reports" className={sidebarLinkClass}>
           Reports
         </NavLink>
+        <NavLink to="/water-quality" className={sidebarLinkClass}>
+          Water Quality
+        </NavLink>
         <NavLink to="/comments" className={sidebarLinkClass}>
           Comments
         </NavLink>

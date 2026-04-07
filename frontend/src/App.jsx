@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import NavBar from "./components/NavBar";
-import FieldOfficerSidebar from "./components/FieldOfficerSidebar";
+import FieldOfficerSidebar from "./components/FieldOfficerSidebar"; 
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
@@ -23,6 +23,9 @@ import AddComments from "./pages/AddComments";
 import WellReportDetails from "./pages/WellReportDetails";
 import UpdateWellReport from "./pages/UpdateWellReport";
 import CommentsPage from "./pages/CommentsPage";
+import LabTesterDashboard from "./pages/LabTesterDashboard";
+import WaterQuality from "./pages/WaterQuality";
+import EditWaterTest from "./pages/EditWaterTest";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -54,28 +57,27 @@ function AppContent() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <main className="flex-1 overflow-x-hidden overflow-y-auto">
             <Routes>
-              {/* --- 4. REDIRECT LOGIC FOR ROOT PATH (/) --- */}
+              {/* Redirect logic for Root Path */}
               <Route path="/" element={
                 !user ? <Login /> :
-                  user.role === "admin" ? <Navigate to="/admin" /> :
-                    user.role === "field_officer" ? <Navigate to="/officer-dashboard" /> :
-                      <Navigate to="/home" />
+                user.role === "admin" ? <Navigate to="/admin" /> :
+                user.role === "field_officer" ? <Navigate to="/officer-dashboard" /> :
+                user.role === "lab_tester" ? <Navigate to="/lab-dashboard" /> :
+                user.role === "customer" ? <Navigate to="/home" /> :
+                <Navigate to="/home" />
               } />
 
               <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
               <Route path="/signup" element={<Signup />} />
-
-              {/* --- 5. DASHBOARD ROUTES --- */}
+              
+              {/* --- ADMIN ONLY ROUTES --- */}
               <Route path="/admin" element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/wells" element={<WellsList />} />
-              <Route path="/wells/add" element={<AddWell />} />
-              <Route path="/wells/edit/:id" element={<EditWell />} />
-              <Route path="/wells/:id" element={<WellDetails />} />
 
+              {/* --- FIELD OFFICER ONLY ROUTES --- */}
               <Route path="/officer-dashboard" element={
                 <ProtectedRoute allowedRoles={["field_officer"]}>
                   <FieldOfficerDashboard />
@@ -87,68 +89,66 @@ function AppContent() {
                 </ProtectedRoute>
               } />
               <Route path="/add-report" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                <ProtectedRoute allowedRoles={["field_officer"]}>
                   <AddWellReport />
                 </ProtectedRoute>
               } />
 
               <Route path="/update-report/:id" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                <ProtectedRoute allowedRoles={["field_officer"]}>
                   <UpdateWellReport />
                 </ProtectedRoute>
               } />
 
               <Route path="/add-comment/:id" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+                <ProtectedRoute allowedRoles={["field_officer"]}>
                   <AddComments />
                 </ProtectedRoute>
               } />
 
-              {/* --- 8. SHARED REPORT ROUTES --- */}
+              {/* --- SHARED ROUTES (Both Admin & Officer can VIEW) --- */}
               <Route path="/reports" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer", "customer"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
                   <ReportsPage />
                 </ProtectedRoute>
               } />
 
               <Route path="/reports/:id" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer", "customer"]}>
+                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
                   <WellReportDetails />
                 </ProtectedRoute>
               } />
 
               <Route path="/comments" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer", "customer"]}>
+                <ProtectedRoute allowedRoles={["field_officer", "admin"]}>
                   <CommentsPage />
                 </ProtectedRoute>
               } />
 
-              {/* --- 9. ADMINISTRATIVE WELL MANAGEMENT --- */}
-              <Route path="/wells/add" element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <AddWell />
-                </ProtectedRoute>
-              } />
+              {/* General Navigation */}
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/wells" element={<WellsList />} />
+              <Route path="/wells/add" element={<AddWell />} />
+              <Route path="/wells/edit/:id" element={<EditWell />} />
+              <Route path="/wells/:id" element={<WellDetails />} />
+              
+              <Route path="/maintenance" element={<MaintenanceList />} />
+              <Route path="/maintenance/:id" element={<MaintenanceDetails />} />
+              <Route path="/maintenance/new" element={<MaintenanceForm />} />
 
-              <Route path="/wells/edit/:id" element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <EditWell />
+              <Route path="/water-quality" element={
+                <ProtectedRoute allowedRoles={["lab_tester"]}>
+                  <WaterQuality />
                 </ProtectedRoute>
               } />
-
-              <Route path="/maintenance" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
-                  <MaintenanceList />
+              <Route path="/lab-dashboard" element={
+                <ProtectedRoute allowedRoles={["lab_tester"]}>
+                  <LabTesterDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/maintenance/:id" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
-                  <MaintenanceDetails />
-                </ProtectedRoute>
-              } />
-              <Route path="/maintenance/new" element={
-                <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
-                  <MaintenanceForm />
+              <Route path="/water-quality/edit/:id" element={
+                <ProtectedRoute allowedRoles={["lab_tester"]}>
+                  <EditWaterTest />
                 </ProtectedRoute>
               } />
 
@@ -170,4 +170,4 @@ function App() {
   );
 }
 
-export default App;
+export default App

@@ -411,10 +411,14 @@ export const deleteComment = async (req, res) => {
 
     // Remove the comment using pull
     report.comments.pull({ _id: commentId });
+
     await report.save();
 
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+<<<<<<< HEAD
+};
+=======
 };

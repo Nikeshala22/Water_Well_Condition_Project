@@ -9,6 +9,8 @@ import wellsRoutes from "./routes/wellsRoutes.js";
 import waterQualityRoutes from "./routes/waterQualityRoutes.js";
 import maintenanceRequestRoutes from "./routes/maintenanceRequestRoutes.js"; 
 
+import dns from "node:dns/promises";
+dns.setServers(["1.1.1.1","1.0.0.1"]);
 
 //initialize express app
 const app = express()

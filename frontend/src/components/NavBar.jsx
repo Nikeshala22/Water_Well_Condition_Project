@@ -8,7 +8,7 @@ const NavBar = () => {
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Link Styling logic
+  // Styling for the horizontal links in the Top Bar
   const linkClass = ({ isActive }) =>
     isActive
       ? "text-blue-600 bg-blue-50 px-3 py-2 rounded-lg text-sm font-bold transition-all duration-200"
@@ -53,34 +53,36 @@ const NavBar = () => {
                       <NavLink to="/admin" className={linkClass}>Admin Panel</NavLink>
                       <NavLink to="/wells" className={linkClass}>Manage Wells</NavLink>
                       <NavLink to="/reports" className={linkClass}>All Reports</NavLink>
+                      <NavLink to="/lab-reports" className={linkClass}>Lab Sync</NavLink>
                     </>
                   )}
 
                   {/* FIELD OFFICER LINKS */}
                   {user.role === "field_officer" && (
                     <>
-                      <NavLink to="/officer-dashboard" className={linkClass}>Dashboard</NavLink>
+                      <NavLink to="/field-dashboard" className={linkClass}>Dashboard</NavLink>
                       <NavLink to="/reports" className={linkClass}>Reports</NavLink>
+                      <NavLink to="/maintenance" className={linkClass}>Maintenance</NavLink>
                     </>
                   )}
 
-                  {/* CUSTOMER LINKS */}
-                  {user.role === "customer" && (
+                  {/* LAB TESTER LINKS */}
+                  {user.role === "lab_tester" && (
                     <>
-                      <NavLink to="/home" className={linkClass}>Home</NavLink>
-                      <NavLink to="/wells" className={linkClass}>Wells</NavLink>
-                    </>
-                  )}
+                      <NavLink to="/lab-dashboard" className={linkClass}>Lab Dashboard</NavLink>
+                      <NavLink to="/water-quality" className={linkClass}>Water Tests</NavLink>
+                       </>
+                      )}
                 </div>
 
-                {/* Profile Section */}
+                {/* User Profile & Logout Section */}
                 <div className="flex items-center gap-3 border-l pl-4 border-gray-200">
                   <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest bg-gray-100 px-2 py-1 rounded">
                     {user.role?.replace('_', ' ')}
                   </span>
                   <button
                     onClick={logout}
-                    className="text-xs font-bold text-white bg-slate-900 hover:bg-black px-4 py-2 rounded-lg transition-all"
+                    className="text-xs font-bold text-white bg-slate-900 hover:bg-black px-4 py-2 rounded-lg transition-all shadow-sm active:scale-95"
                   >
                     Logout
                   </button>
@@ -89,7 +91,7 @@ const NavBar = () => {
             ) : (
               <div className="flex items-center space-x-3">
                 <NavLink to="/login" className={linkClass}>Login</NavLink>
-                <NavLink to="/signup" className="text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg">
+                <NavLink to="/signup" className="text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg shadow-sm transition-all">
                   Sign Up
                 </NavLink>
               </div>
@@ -97,8 +99,8 @@ const NavBar = () => {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="md:hidden">
-            <button onClick={toggleMenu} className="text-gray-500 p-2">
+          <div className="md:hidden flex items-center">
+            <button onClick={toggleMenu} className="text-gray-500 p-2 rounded-md hover:bg-gray-100 transition-colors">
               {isOpen ? (
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               ) : (
@@ -111,32 +113,32 @@ const NavBar = () => {
 
       {/* Mobile Menu Dropdown */}
       <div className={`md:hidden transition-all duration-300 overflow-hidden ${isOpen ? "max-h-screen opacity-100 border-t" : "max-h-0 opacity-0"}`}>
-        <div className="px-4 py-4 space-y-1 bg-white">
+        <div className="px-4 py-4 space-y-1 bg-white shadow-xl">
           {user ? (
             <>
-              {/* Mobile Admin */}
-              {user.role === "admin" && (
-                <>
-                  <NavLink to="/admin" onClick={toggleMenu} className={mobileLinkClass}>Admin Panel</NavLink>
-                  <NavLink to="/wells" onClick={toggleMenu} className={mobileLinkClass}>Manage Wells</NavLink>
-                  <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>All Reports</NavLink>
-                </>
-              )}
-              {/* Mobile Officer */}
-              {user.role === "field_officer" && (
-                <>
-                  <NavLink to="/officer-dashboard" onClick={toggleMenu} className={mobileLinkClass}>Dashboard</NavLink>
-                  <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>Reports</NavLink>
-                </>
-              )}
-              {/* Mobile Customer */}
-              {user.role === "customer" && (
-                <>
-                  <NavLink to="/home" onClick={toggleMenu} className={mobileLinkClass}>Home</NavLink>
-                  <NavLink to="/wells" onClick={toggleMenu} className={mobileLinkClass}>Wells</NavLink>
-                </>
-              )}
-              <button onClick={logout} className="w-full mt-4 text-white bg-slate-900 py-3 rounded-xl font-bold uppercase text-xs">Logout Session</button>
+              {user.role === "admin" ? (
+  <>
+    <NavLink to="/admin" onClick={toggleMenu} className={mobileLinkClass}>Admin Panel</NavLink>
+    <NavLink to="/wells" onClick={toggleMenu} className={mobileLinkClass}>Wells</NavLink>
+    <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>Reports</NavLink>
+  </>
+) : user.role === "field_officer" ? (
+  <>
+    <NavLink to="/field-dashboard" onClick={toggleMenu} className={mobileLinkClass}>Dashboard</NavLink>
+    <NavLink to="/add-report" onClick={toggleMenu} className={mobileLinkClass}>Add New Report</NavLink>
+    <NavLink to="/reports" onClick={toggleMenu} className={mobileLinkClass}>History</NavLink>
+  </>
+) : user.role === "lab_tester" ? (
+  <>
+    <NavLink to="/lab-dashboard" onClick={toggleMenu} className={mobileLinkClass}>
+      Lab Dashboard
+    </NavLink>
+    <NavLink to="/water-quality" onClick={toggleMenu} className={mobileLinkClass}>
+      Water Tests
+    </NavLink>
+  </>
+) : null}
+              <button onClick={logout} className="w-full mt-4 text-white bg-slate-900 py-3 rounded-xl font-bold uppercase tracking-widest text-xs">Logout Session</button>
             </>
           ) : (
             <>

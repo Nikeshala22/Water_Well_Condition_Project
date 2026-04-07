@@ -22,7 +22,7 @@ router.get("/", protect, authorizeRoles("admin", "field_officer", "lab_tester", 
 router.get("/id/:id", protect, authorizeRoles("admin", "field_officer", "lab_tester", "customer"), getWellById);
 
 // Get Single Well by input wellId
-router.get("/wellId/:wellId", protect, authorizeRoles("admin", "field_officer", "lab_tester", "customer"), getWellByWellId);
+router.get("/wellId/:wellId", protect, authorizeRoles("admin", "field_officer", "visitor"), getWellByWellId);
 
 // Update metadata (Admin only)
 router.put("/:id", protect, authorizeRoles("admin"), updateWell);
@@ -35,4 +35,7 @@ router.delete("/:id", protect, authorizeRoles("admin"), deleteWell);
 
 
 
+<<<<<<< HEAD
+export default router;
+=======
 export default router;
