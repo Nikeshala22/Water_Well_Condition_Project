@@ -167,7 +167,6 @@ export const deleteTestResult = async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: "Delete failed", error: err.message });
     }
-<<<<<<< HEAD
+
 };
-=======
-};
+

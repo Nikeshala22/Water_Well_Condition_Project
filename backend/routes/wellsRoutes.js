@@ -35,7 +35,5 @@ router.delete("/:id", protect, authorizeRoles("admin"), deleteWell);
 
 
 
-<<<<<<< HEAD
-export default router;
-=======
+
 export default router;

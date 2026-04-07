@@ -33,5 +33,4 @@ export const authorizeRoles = (...roles) => {
     }
     next();
   };
-<<<<<<< HEAD
 };
