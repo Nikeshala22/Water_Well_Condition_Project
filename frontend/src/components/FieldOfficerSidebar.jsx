@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, FilePlus, ClipboardList, MessageSquare, Droplets, Wrench } from "lucide-react";
+import { LayoutDashboard, FilePlus, ClipboardList, MessageSquare, Droplets,Map,Wrench } from "lucide-react";
 
 const FieldOfficerSidebar = () => {
   const sidebarLinkClass = ({ isActive }) =>
@@ -46,6 +46,11 @@ const FieldOfficerSidebar = () => {
           <Wrench className="w-5 h-5" />
           Maintenance Tasks
         </NavLink>
+
+        <NavLink to="/maintenance/map" className={sidebarLinkClass}>
+          <Map className="w-5 h-5" />
+          Route Map
+        </NavLink>
         
         <NavLink to="/comments" className={sidebarLinkClass}>
           <MessageSquare className="w-5 h-5" />
@@ -66,4 +71,4 @@ const FieldOfficerSidebar = () => {
   );
 };
 
-export default FieldOfficerSidebar;
+export default FieldOfficerSidebar;

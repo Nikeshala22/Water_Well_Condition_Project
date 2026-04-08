@@ -23,6 +23,7 @@ const AddComments = lazy(() => import("./pages/AddComments"));
 const WellReportDetails = lazy(() => import("./pages/WellReportDetails"));
 const UpdateWellReport = lazy(() => import("./pages/UpdateWellReport"));
 const CommentsPage = lazy(() => import("./pages/CommentsPage"));
+const MaintenanceMap = lazy(() => import("./pages/MaintenanceMap"));
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -86,6 +87,11 @@ function AppRoutes() {
         <Route path="/maintenance" element={
           <ProtectedRoute allowedRoles={["admin", "field_officer", "customer", "communityUser"]}>
             <MaintenanceList />
+          </ProtectedRoute>
+        } />
+        <Route path="/maintenance/map" element={
+          <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
+            <MaintenanceMap />
           </ProtectedRoute>
         } />
         <Route path="/maintenance/new" element={
