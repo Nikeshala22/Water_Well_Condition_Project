@@ -4,8 +4,10 @@ import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import { 
   ArrowLeft, Clock, AlertCircle, CheckCircle, Zap, 
-  Droplet, UserCircle, MapPin, Calendar, Edit2, ShieldCheck 
+  Droplet, UserCircle, MapPin, Calendar, Edit2, ShieldCheck,
+  CloudSun
 } from "lucide-react";
+import WeatherRiskCard from "../components/WeatherRiskCard";
 
 const MaintenanceDetails = () => {
   const { id } = useParams();
@@ -13,13 +15,14 @@ const MaintenanceDetails = () => {
   const { user } = useAuth();
   
   const [request, setRequest] = useState(null);
+  console.log("Current User Role:", user?.role);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Status/Assignment update states
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [statusInput, setStatusInput] = useState("");
-  const [fieldOfficers, setFieldOfficers] = useState([]);
+  const [field_officers, setFieldOfficers] = useState([]);
   const [assignInput, setAssignInput] = useState("");
   const [isAssigning, setIsAssigning] = useState(false);
   const [actionError, setActionError] = useState(null);
@@ -31,6 +34,8 @@ const MaintenanceDetails = () => {
         setLoading(true);
         const res = await api.get(`/maintenance/${id}`);
         setRequest(res.data);
+        console.log("Maintenance Request Data:", res.data);
+        console.log("Well Coordinates:", res.data.wellId?.location?.coordinates);
         setStatusInput(res.data.status);
         setAssignInput(res.data.assignedTo?._id || "");
       } catch {
@@ -42,9 +47,8 @@ const MaintenanceDetails = () => {
 
     const fetchFieldOfficers = async () => {
       try {
-        // Note: Assuming an endpoint to fetch users by role exists
-        // Fallback or mock if it doesn't
-        const res = await api.get("/users?role=fieldOfficer");
+        // Endpoint updated to /api/auth as registered in backend
+        const res = await api.get("/auth?role=field_officer");
         setFieldOfficers(res.data);
       } catch (e) {
         console.error("Failed to fetch field officers.", e);
@@ -155,6 +159,16 @@ const MaintenanceDetails = () => {
         </div>
       )}
 
+      {!request.wellId && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center text-amber-700">
+          <AlertCircle className="w-5 h-5 mr-3 shrink-0" />
+          <div>
+            <h3 className="text-sm font-bold">Unlinked Maintenance Request</h3>
+            <p className="text-xs mt-1">This request is not linked to a valid well (it may have been deleted). Weather insights and location data are unavailable.</p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Header section */}
         <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-start md:justify-between gap-4 bg-gray-50/50">
@@ -173,7 +187,9 @@ const MaintenanceDetails = () => {
             </h1>
             <p className="text-gray-600 mt-1 flex items-center text-sm">
               <MapPin className="w-4 h-4 mr-1" /> 
-              {request.wellId?.location ? `${request.wellId.location.lat}, ${request.wellId.location.lng}` : "Location unknown"}
+              {request.wellId?.location?.coordinates 
+                ? `${request.wellId.location.coordinates[1].toFixed(4)}, ${request.wellId.location.coordinates[0].toFixed(4)}` 
+                : "Location unknown"}
             </p>
           </div>
 
@@ -206,6 +222,12 @@ const MaintenanceDetails = () => {
                 </div>
               </div>
             </div>
+            
+            {(user?.role === "admin" || user?.role === "field_officer") && (
+              <div className="mt-8">
+                <WeatherRiskCard wellId={request.wellId?._id} />
+              </div>
+            )}
           </div>
 
           <div className="space-y-6 border-t md:border-t-0 md:border-l border-gray-100 pt-6 md:pt-0 md:pl-8">
@@ -238,7 +260,7 @@ const MaintenanceDetails = () => {
             </div>
 
             {/* Admin / Field Officer Action Panel */}
-            {(user?.role === "admin" || user?.role === "fieldOfficer") && (
+            {(user?.role === "admin" || user?.role === "field_officer") && (
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-100 mt-6">
                 <h3 className="text-sm font-semibold text-blue-900 flex items-center mb-4">
                   <Edit2 className="w-4 h-4 mr-1.5" />
@@ -279,13 +301,12 @@ const MaintenanceDetails = () => {
                         className="block w-full rounded-md border-blue-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white"
                       >
                         <option value="" disabled>Select officer</option>
-                        {fieldOfficers.length > 0 ? (
-                          fieldOfficers.map(officer => (
+                        {field_officers.length > 0 ? (
+                          field_officers.map(officer => (
                             <option key={officer._id} value={officer._id}>{officer.username}</option>
                           ))
                         ) : (
-                          // Fallback if users endpoint doesn't exist
-                          <option value="temp-id">Fetch Failed: Check /users API</option>
+                          <option disabled>No officers found</option>
                         )}
                       </select>
                       <button

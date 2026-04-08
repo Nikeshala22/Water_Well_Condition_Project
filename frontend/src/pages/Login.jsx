@@ -31,7 +31,7 @@ const Login = () => {
         navigate("/officer-dashboard");
       } else if (res.data.role === "lab_tester") {
         navigate("/lab-dashboard");
-      } else if (res.data.role === "customer") {
+      } else if (res.data.role === "customer" || res.data.role === "communityUser") {
         navigate("/home");
       } else {
         // Customers and default users go to Home

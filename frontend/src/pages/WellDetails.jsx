@@ -29,7 +29,7 @@ const WellDetails = () => {
   const isAdmin = user?.role === 'admin';
   const isFieldOfficer = user?.role === 'field_officer';
   const isLabTester = user?.role === 'lab_tester';
-  const isCustomer = user?.role === 'customer';
+  const isCustomer = (user?.role === 'customer' || user?.role === 'communityUser');
 
   // Action Permissions (Customers CANNOT edit or add)
   const canEditDetails = isAdmin;

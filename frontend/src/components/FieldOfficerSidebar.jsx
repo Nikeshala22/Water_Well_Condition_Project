@@ -1,37 +1,69 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { LayoutDashboard, FilePlus, ClipboardList, MessageSquare, Droplets, Wrench } from "lucide-react";
 
 const FieldOfficerSidebar = () => {
   const sidebarLinkClass = ({ isActive }) =>
-    `block px-6 py-3 text-sm font-medium transition-all duration-200 ${
+    `flex items-center gap-3 px-4 py-3 mx-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
       isActive
-        ? "bg-blue-800 text-white border-l-4 border-white"
-        : "text-blue-100 hover:bg-blue-700 hover:text-white"
+        ? "bg-blue-50 text-blue-600 shadow-sm"
+        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
     }`;
 
   return (
-    <div className="w-64 bg-blue-600 min-h-screen shadow-lg hidden md:block">
-      <div className="p-6">
-        <h2 className="text-white text-2xl font-black uppercase tracking-tighter">
-          Officer Panel
-        </h2>
+    <div className="h-full flex flex-col pt-6 pb-4">
+      {/* Sidebar Header (Optional, since we have NavBar) */}
+      <div className="px-6 mb-8 lg:hidden">
+        <div className="flex items-center gap-2">
+          <Droplets className="text-blue-600 w-6 h-6" />
+          <span className="font-black text-xl tracking-tighter uppercase">WellSync</span>
+        </div>
       </div>
-      <nav className="mt-4">
+
+      <nav className="flex-1 space-y-1">
+        <div className="px-6 mb-4">
+          <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">
+            Main Menu
+          </span>
+        </div>
+        
         <NavLink to="/officer-dashboard" className={sidebarLinkClass}>
+          <LayoutDashboard className="w-5 h-5" />
           Dashboard
         </NavLink>
+        
         <NavLink to="/add-report" className={sidebarLinkClass}>
+          <FilePlus className="w-5 h-5" />
           Add Report
         </NavLink>
+        
         <NavLink to="/reports" className={sidebarLinkClass}>
-          Reports
+          <ClipboardList className="w-5 h-5" />
+          Well Reports
         </NavLink>
+
+        <NavLink to="/maintenance" className={sidebarLinkClass}>
+          <Wrench className="w-5 h-5" />
+          Maintenance Tasks
+        </NavLink>
+        
         <NavLink to="/comments" className={sidebarLinkClass}>
+          <MessageSquare className="w-5 h-5" />
           Comments
         </NavLink>
       </nav>
+
+      {/* Sidebar Footer Info */}
+      <div className="px-6 mt-auto">
+        <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
+          <p className="text-xs font-bold text-blue-700 leading-tight mb-1">Field Support</p>
+          <p className="text-[10px] text-blue-600/70 font-medium leading-relaxed">
+            Need help? Contact the admin team for technical support.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default FieldOfficerSidebar;
+export default FieldOfficerSidebar;

@@ -53,10 +53,31 @@ export const checkWeatherRisk = async (wellId, userId) => {
   const well = await Well.findById(wellId);
   if (!well) throw new Error("Well not found");
 
-  const { lat, lng } = well.location;
-  if (!lat || !lng) throw new Error("Well has no coordinates");
+  const [lng, lat] = well.location.coordinates;
+  console.log(`Checking Weather Risk for Well ${wellId} at [${lat}, ${lng}]`);
+  if (lat === undefined || lng === undefined) throw new Error("Well has no coordinates");
 
   const weatherData = await weatherService.checkRainfall(lat, lng);
+
+  // Format the output specifically for the WeatherRiskCard component
+  const formatWeatherOutput = (createdReq = null) => {
+    return {
+      riskDetected: weatherData.heavyRainfall,
+      weather: {
+        temp: weatherData.current.temperature_2m,
+        humidity: weatherData.current.relative_humidity_2m,
+        windSpeed: weatherData.current.wind_speed_10m
+      },
+      riskLevel: weatherData.heavyRainfall ? "High" : weatherData.precipitation > 5 ? "Medium" : "Low",
+      recommendation: weatherData.heavyRainfall 
+        ? "Immediate inspection required. Critical rainfall detected exceeding safe volume thresholds." 
+        : weatherData.precipitation > 5 
+          ? "Monitor well and surrounding drainage. Intermediate runoff poses a moderate threat." 
+          : "Conditions are currently safe and optimal for standard operations.",
+      precipitation: weatherData.precipitation,
+      requestCreated: createdReq
+    };
+  };
 
   if (weatherData.heavyRainfall) {
     // Automatically create a high-priority maintenance alert
@@ -69,12 +90,8 @@ export const checkWeatherRisk = async (wellId, userId) => {
       requestedBy: userId // Will be the admin/system user triggering the check
     });
 
-    return {
-      riskDetected: true,
-      weatherData,
-      requestCreated: newRequest
-    };
+    return formatWeatherOutput(newRequest);
   }
 
-  return { riskDetected: false, weatherData };
+  return formatWeatherOutput(null);
 };

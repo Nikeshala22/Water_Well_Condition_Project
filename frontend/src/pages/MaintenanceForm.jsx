@@ -22,9 +22,12 @@ const MaintenanceForm = () => {
     const fetchWells = async () => {
       try {
         const response = await api.get("/wells"); 
-        // Note: Assuming there is a GET /api/wells endpoint based on Well model
-        // If not, this might need an update to fetch only active wells or all wells.
-        setWells(response.data);
+        // Backend returns: { success: true, count: X, data: [...] }
+        if (response.data && response.data.data) {
+          setWells(response.data.data);
+        } else {
+          setWells(Array.isArray(response.data) ? response.data : []);
+        }
       } catch (err) {
         console.error("Failed to fetch wells:", err);
         setError("Failed to load wells. Please try again later.");
@@ -41,6 +44,12 @@ const MaintenanceForm = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!formData.wellId) {
+      setError("Please select a well before submitting.");
+      setLoading(false);
+      return;
+    }
 
     try {
       await api.post("/maintenance", formData);
