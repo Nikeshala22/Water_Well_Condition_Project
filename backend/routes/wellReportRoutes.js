@@ -28,12 +28,14 @@ const validate = (req, res, next) => {
   next();
 };
 
-// --- GET ROUTES (Admin & Field Officer can view) ---
-router.get("/", protect, authorizeRoles("admin", "field_officer"), getReports);
-router.get("/well/:wellId", protect, authorizeRoles("admin", "field_officer"), getReportsByWell);
-router.get("/comments/all", protect, authorizeRoles("admin", "field_officer"), getAllComments);
-router.get("/comments/well/:wellId", protect, authorizeRoles("admin", "field_officer"), getWellComments);
-router.get("/:id", protect, authorizeRoles("admin", "field_officer"), getSingleReport);
+// 2. ROUTES
+
+// --- GET ROUTES (Shared Access) ---
+router.get("/", protect, allowRoles("admin", "field_officer", "customer", "communityUser"), getReports);
+router.get("/well/:wellId", protect, allowRoles("admin", "field_officer", "customer", "communityUser"), getReportsByWell);
+router.get("/comments/all", protect, allowRoles("admin", "field_officer"), getAllComments);
+router.get("/comments/well/:wellId", protect, allowRoles("admin", "field_officer"), getWellComments);
+router.get("/:id", protect, allowRoles("admin", "field_officer", "customer", "communityUser"), getSingleReport);
 
 // --- POST/PUT/DELETE ROUTES (Only Field Officers can modify) ---
 router.post(

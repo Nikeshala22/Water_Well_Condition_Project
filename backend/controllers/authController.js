@@ -47,3 +47,14 @@ export const login = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// GET ALL USERS (Admin Only - can be used to list field officers)
+export const getUsers = async (req, res) => {
+  try {
+    const { role } = req.query;
+    const filter = role ? { role } : {};
+    const users = await User.find(filter).select("-password");
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

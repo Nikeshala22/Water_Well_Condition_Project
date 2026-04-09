@@ -22,13 +22,13 @@ const router = express.Router();
 // Apply protect middleware to all routes
 router.use(protect);
 
-router.post("/", authorizeRoles("communityUser"), validateCreateMaintenanceRequest, create);
-router.get("/weather-risk/:wellId", authorizeRoles("admin", "fieldOfficer"), getWeatherRisk);
+router.post("/", authorizeRoles("customer", "communityUser"), validateCreateMaintenanceRequest, create);
+router.get("/weather-risk/:wellId", authorizeRoles("admin", "field_officer"), getWeatherRisk);
 router.get("/", getAll);
 router.get("/:id", getById);
-router.put("/:id", authorizeRoles("fieldOfficer"), validateUpdateMaintenanceRequest, update);
+router.put("/:id", authorizeRoles("field_officer"), validateUpdateMaintenanceRequest, update);
 router.patch("/:id/assign", authorizeRoles("admin"), assign);
-router.patch("/:id/status", authorizeRoles("fieldOfficer", "admin"), validateUpdateStatus, updateStatus);
+router.patch("/:id/status", authorizeRoles("field_officer", "admin"), validateUpdateStatus, updateStatus);
 router.delete("/:id", authorizeRoles("admin"), deleteReq);
 
 export default router;

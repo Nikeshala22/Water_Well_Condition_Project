@@ -1,8 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
+import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
-import { NavLink } from "react-router-dom"; // <-- Imported NavLink
+import { NavLink } from "react-router-dom";
+import { 
+  Plus, AlertTriangle, Clock, CheckCircle, Droplet, 
+  Zap, Search, LayoutDashboard, Database, FileText, 
+  FlaskConical, Settings, LogOut, Toolbox
+} from "lucide-react";
 
 const mapContainerStyle = {
   width: "100%",
@@ -13,6 +18,8 @@ const AdminDashboard = () => {
   const { logout } = useAuth();
 
   const [wells, setWells] = useState([]);
+  const [maintenance, setMaintenance] = useState([]);
+  const [loading, setLoading] = useState(true);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
 
@@ -23,15 +30,18 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        const wellsRes = await axios.get("http://localhost:5000/api/wells", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        setLoading(true);
+        const [wellsRes, maintenanceRes] = await Promise.all([
+          api.get("/wells"),
+          api.get("/maintenance")
+        ]);
 
         setWells(wellsRes.data.data);
+        setMaintenance(maintenanceRes.data);
       } catch (err) {
-        console.log(err);
+        console.error("Dashboard Fetch Error:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -123,10 +133,45 @@ const AdminDashboard = () => {
               <h2 className="text-4xl font-extrabold text-blue-600">{wells.length}</h2>
             </div>
             <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+              <Database className="w-6 h-6" />
             </div>
           </div>
-          {/* You can add more stats cards here later (e.g., Active Alerts, Pending Lab Reports) */}
+
+          <div className="bg-white shadow-sm border border-gray-100 p-6 rounded-2xl flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500 mb-1 uppercase tracking-wider">Active Tasks</p>
+              <h2 className="text-4xl font-extrabold text-orange-600">
+                {maintenance.filter(m => m.status !== "Completed").length}
+              </h2>
+            </div>
+            <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center">
+              <Toolbox className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white shadow-sm border border-gray-100 p-6 rounded-2xl flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500 mb-1 uppercase tracking-wider">Critical Failures</p>
+              <h2 className="text-4xl font-extrabold text-red-600">
+                {maintenance.filter(m => m.priority === "High" && m.status !== "Completed").length}
+              </h2>
+            </div>
+            <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white shadow-sm border border-gray-100 p-6 rounded-2xl flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500 mb-1 uppercase tracking-wider">Ready Units</p>
+              <h2 className="text-4xl font-extrabold text-emerald-600">
+                {wells.length - maintenance.filter(m => m.status !== "Completed").length}
+              </h2>
+            </div>
+            <div className="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+          </div>
         </div>
 
         {/* Google Map Section */}
