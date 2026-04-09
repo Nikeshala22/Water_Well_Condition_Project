@@ -24,6 +24,10 @@ const WellReportDetails = lazy(() => import("./pages/WellReportDetails"));
 const UpdateWellReport = lazy(() => import("./pages/UpdateWellReport"));
 const CommentsPage = lazy(() => import("./pages/CommentsPage"));
 const MaintenanceMap = lazy(() => import("./pages/MaintenanceMap"));
+const LabTesterDashboard = lazy(() => import("./pages/LabTesterDashboard"));
+const WaterQuality = lazy(() => import("./pages/WaterQuality"));
+const EditWaterTest = lazy(() => import("./pages/EditWaterTest"));
+
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -33,9 +37,10 @@ function AppRoutes() {
       <Route element={<MainLayout />}>
         {/* --- Public Landing Page (HomePage) --- */}
         <Route path="/" element={
-          !user ? <HomePage /> : 
+          !user ? <Login /> : 
             user.role === "admin" ? <Navigate to="/admin" /> :
               user.role === "field_officer" ? <Navigate to="/officer-dashboard" /> :
+                user.role === "lab_tester" ? <Navigate to="/lab-dashboard" /> :
                 (user.role === "customer" || user.role === "communityUser") ? <Navigate to="/home" /> :
                 <Navigate to="/home" />
         } />
@@ -134,6 +139,23 @@ function AppRoutes() {
         <Route path="/add-comment/:id" element={
           <ProtectedRoute allowedRoles={["admin", "field_officer"]}>
             <AddComments />
+          </ProtectedRoute>
+        } />
+
+        {/* Lab Tester Routes */}
+        <Route path="/lab-dashboard" element={
+          <ProtectedRoute allowedRoles={["lab_tester"]}>
+            <LabTesterDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/water-quality" element={
+          <ProtectedRoute allowedRoles={["lab_tester"]}>
+            <WaterQuality />
+          </ProtectedRoute>
+        } />
+        <Route path="/water-quality/edit/:id" element={
+          <ProtectedRoute allowedRoles={["lab_tester"]}>
+            <EditWaterTest />
           </ProtectedRoute>
         } />
 
