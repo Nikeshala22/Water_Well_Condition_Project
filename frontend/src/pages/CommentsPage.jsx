@@ -31,7 +31,7 @@ const CommentsPage = () => {
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get("${API_URL}/api/reports/comments/all", {
+      const response = await axios.get(`${API_URL}/api/reports/comments/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setComments(response.data);

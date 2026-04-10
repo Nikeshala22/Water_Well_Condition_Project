@@ -28,7 +28,7 @@ const AddWell = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post("${API_URL}/api/wells", formData, {
+      await axios.post(`${API_URL}/api/wells`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/wells"); // Redirect back to list on success

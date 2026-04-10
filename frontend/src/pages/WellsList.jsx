@@ -20,7 +20,7 @@ const WellsList = () => {
   const fetchWells = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("${API_URL}/api/wells", {
+      const res = await axios.get(`${API_URL}/api/wells`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWells(res.data.data);

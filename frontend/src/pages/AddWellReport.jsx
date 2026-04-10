@@ -30,12 +30,12 @@ const AddWellReport = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         // 1. Fetch ALL Assets
-        const wellsRes = await axios.get("${API_URL}/api/wells", { headers });
+        const wellsRes = await axios.get(`${API_URL}/api/wells`, { headers });
         const wellsData = wellsRes.data?.data || wellsRes.data;
         if (Array.isArray(wellsData)) setWells(wellsData);
 
         // 2. Fetch ALL Reports from ALL Field Officers
-        const reportsRes = await axios.get("${API_URL}/api/reports", { headers });
+        const reportsRes = await axios.get(`${API_URL}/api/reports`, { headers });
         const allReports = Array.isArray(reportsRes.data) ? reportsRes.data : (reportsRes.data?.data || []);
         
         // 3. GLOBAL LOCKING LOGIC
@@ -82,7 +82,7 @@ const AddWellReport = () => {
       Object.keys(formData).forEach(key => data.append(key, formData[key]));
       if (photo) data.append("photo", photo);
 
-      await axios.post("${API_URL}/api/reports", data, {
+      await axios.post(`${API_URL}/api/reports`, data, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
       });
 

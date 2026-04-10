@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
   // ✅ Signup function
   const signup = async (formData) => {
-    const res = await axios.post("${API_URL}/api/auth/signup", formData);
+    const res = await axios.post(`${API_URL}/api/auth/signup`, formData);
     return res.data; // return backend response for frontend
   };
 
