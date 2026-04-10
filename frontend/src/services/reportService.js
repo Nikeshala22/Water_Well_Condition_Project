@@ -1,15 +1,15 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/reports";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
-// Get token from localStorage (if you store login token)
+// Get token
 const getToken = () => {
   return localStorage.getItem("token");
 };
 
 // Get all reports
 export const getReports = async () => {
-  const response = await axios.get(API_URL, {
+  const response = await axios.get(`${BASE_URL}/api/reports`, {
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const EditWell = () => {
   const { id } = useParams(); // Gets the Mongo ID from the URL
@@ -20,7 +21,7 @@ const EditWell = () => {
     const fetchWell = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:5000/api/wells/id/${id}`, {
+        const res = await axios.get(`${API_URL}/api/wells/id/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const wellData = res.data.data;
@@ -52,7 +53,7 @@ const EditWell = () => {
       const token = localStorage.getItem("token");
       
       // Update Metadata
-      await axios.put(`http://localhost:5000/api/wells/${id}`, {
+      await axios.put(`${API_URL}/api/wells/${id}`, {
         name: formData.name,
         village: formData.village,
         depth: formData.depth,
@@ -62,7 +63,7 @@ const EditWell = () => {
       });
 
       // Update Status (Separate endpoint in your backend)
-      await axios.patch(`http://localhost:5000/api/wells/${id}/status`, {
+      await axios.patch(`${API_URL}/api/wells/${id}/status`, {
         status: formData.status
       }, {
         headers: { Authorization: `Bearer ${token}` },

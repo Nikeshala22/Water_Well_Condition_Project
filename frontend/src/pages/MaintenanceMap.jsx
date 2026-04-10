@@ -29,7 +29,7 @@ const MaintenanceMap = () => {
     const fetchMaintenanceTasks = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/maintenance");
+        const response = await api.get("/api/maintenance");
         // Filter for tasks that have well data and coordinates
         const taskData = Array.isArray(response.data) ? response.data : response.data.data || [];
         const validTasks = taskData.filter(req => req.wellId && req.wellId.location && req.wellId.location.coordinates);

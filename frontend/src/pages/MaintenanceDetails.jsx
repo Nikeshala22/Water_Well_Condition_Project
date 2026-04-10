@@ -32,9 +32,8 @@ const MaintenanceDetails = () => {
     const fetchRequestDetails = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/maintenance/${id}`);
+        const res = await api.get(`/api/maintenance/${id}`);
         setRequest(res.data);
-        console.log("Maintenance Request Data:", res.data);
         console.log("Well Coordinates:", res.data.wellId?.location?.coordinates);
         setStatusInput(res.data.status);
         setAssignInput(res.data.assignedTo?._id || "");
@@ -48,7 +47,7 @@ const MaintenanceDetails = () => {
     const fetchFieldOfficers = async () => {
       try {
         // Endpoint updated to /api/auth as registered in backend
-        const res = await api.get("/auth?role=field_officer");
+        const res = await api.get("/api/auth?role=field_officer");
         setFieldOfficers(res.data);
       } catch (e) {
         console.error("Failed to fetch field officers.", e);
@@ -65,7 +64,7 @@ const MaintenanceDetails = () => {
     try {
       setActionError(null);
       setIsUpdatingStatus(true);
-      const res = await api.patch(`/maintenance/${id}/status`, { status: statusInput });
+      const res = await api.patch(`/api/maintenance/${id}/status`, { status: statusInput });
       setRequest(res.data);
       setActionSuccess("Status updated successfully!");
       setTimeout(() => setActionSuccess(null), 3000);
@@ -80,7 +79,7 @@ const MaintenanceDetails = () => {
     try {
       setActionError(null);
       setIsAssigning(true);
-      const res = await api.patch(`/maintenance/${id}/assign`, { assignedTo: assignInput });
+      const res = await api.patch(`/api/maintenance/${id}/assign`, { assignedTo: assignInput });
       setRequest(res.data);
       setStatusInput(res.data.status); // Auto changes to InProgress typically
       setActionSuccess("Request assigned successfully!");

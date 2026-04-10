@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom"; // Added Link
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const WellReportDetails = () => {
   const { id } = useParams();
@@ -12,7 +13,7 @@ const WellReportDetails = () => {
     const fetchReport = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:5000/api/reports/${id}`, {
+        const res = await axios.get(`${API_URL}/api/reports/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setReport(res.data);
