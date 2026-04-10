@@ -19,28 +19,11 @@ const app = express();
 await connectDB();
 
 // ==========================
-// CORS CONFIGURATION
+// CORS CONFIGURATION (FIXED)
 // ==========================
-const allowedOrigins = [
-  "https://water-well-condition-project.vercel.app",
-  "https://water-well-condition-project-70bbtugf3.vercel.app",
-  "http://localhost:3000",
-  "http://localhost:5173"
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.log("Blocked CORS origin:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: true,
     credentials: true
   })
 );
