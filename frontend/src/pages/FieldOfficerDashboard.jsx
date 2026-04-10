@@ -20,8 +20,8 @@ const FieldOfficerDashboard = () => {
         
         // Parallel fetching
         const [reportsRes, maintenanceRes] = await Promise.all([
-          api.get("/reports"),
-          api.get("/maintenance")
+          api.get("/api/reports"),
+          api.get("/api/maintenance")
         ]);
         
         const allReports = Array.isArray(reportsRes.data) ? reportsRes.data : [];
