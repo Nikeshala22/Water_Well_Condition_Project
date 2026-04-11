@@ -1,7 +1,4 @@
 # Rural Water Well Monitoring & Reporting System
-Classification: Public-SLIIT
-
-
 
 📌 1. Project Overview
 
