@@ -251,11 +251,10 @@ Current placeholder response example
 
 
 📌8. Deployment Report
-8.1 Objective
 
 To deploy a stable backend and frontend system with database connectivity.
 
-### 8.2 Deployment Platforms
+###  Deployment Platforms
 
 - Backend deployed using: Render
 - Frontend deployed using: Vercel
@@ -263,92 +262,59 @@ To deploy a stable backend and frontend system with database connectivity.
 
 ---
 
-### 8.3 Backend Deployment (Render)
+###  Backend Deployment (Render)
 
-Steps followed:
-
-1. Created a new Web Service in Render
-2. Connected GitHub repository
-3. Selected backend folder as root directory
-4. Configured build and start commands:
-
+The backend REST API was developed using Node.js and Express.js and deployed on:
+Platform: Render
+Steps:
+1.	Created a new Web Service on Render
+2.	Connected GitHub repository
+3.	Set build and start commands:
 ```bash
 npm install
 npm run start
 ```
----
-Added environment variables:
-MONGO_URI=<your_mongodb_atlas_uri>
-JWT_SECRET=<your_secret_key>
-PORT=5000
+6.	Configured environment variables in Render dashboard
+7.	Deployed the service
+ Backend Live URL:
+https://water-well-condition-project.onrender.com
 
-Deployed backend successfully
+Frontend Deployment
+The frontend React application was deployed on:
+ Platform: Vercel
+ 
+Steps:
+1.	Connected GitHub repository to Vercel
+2.	Selected project framework (React / Vite)
+3.	Configured environment variables
+4.	Deployed via main branch
+Frontend Live URL:
+https://water-well-condition-project.vercel.app
 
-Backend URL:
-https://your-backend-name.onrender.com
+ Environment Variables
+Frontend (.env)
+VITE_API_URL=https://water-well-condition-project.onrender.com
+
+Backend (Render)
+NODE_ENV=development
+MONGO_URI=database_connection_string
+JWT_SECRET=jwt_secret
+FRONTEND_URL=https://water-well-condition-project.vercel.app
+
+Live Application Links
+Service	URL
+Backend API	https://water-well-condition-project.onrender.com
+
+Frontend App	https://water-well-condition-project.vercel.app
+
+
+Notes 
+•	Backend and frontend are deployed separately
+•	Frontend communicates with backend using environment variable (VITE_API_URL)
+•	CORS is configured on backend to allow requests from Vercel domain
+•	Production deployment on Vercel is linked to the main branch
+
+
 <img width="1919" height="1079" alt="Screenshot 2026-04-10 083733" src="https://github.com/user-attachments/assets/25b748ab-6a6f-4a8f-9c79-f11ab1481757" />
-
-8.4 Frontend Deployment (Vercel)
-Steps followed:
-
-Imported project into Vercel
-Selected frontend folder
-Configured build settings:
-npm install
-npm run build
-
-Added environment variable:
-VITE_API_URL=https://your-backend-name.onrender.com
-Deployed frontend successfully
-
-Frontend URL :
-https://your-frontend-name.vercel.app
 <img width="1919" height="1079" alt="Screenshot 2026-04-10 102552" src="https://github.com/user-attachments/assets/efd0e40f-0a75-46f9-a387-ce15b1f62515" />
 
-8.5 System Integration
-Frontend communicates with backend via REST API
-Axios is used to send HTTP requests
-JWT token is stored in localStorage and sent in headers
-API Base URL is configured using environment variables
-
-8.6 Challenges
-CORS issues
-MongoDB connection errors
-JWT authentication issues
-
-8.7 Solutions
-Enabled CORS middleware
-Fixed environment variables
-Verified token format
-
-
-
-📌9. Testing Instruction Report
-    
-9.1 Testing Environment
-Node.js
-MongoDB
-Jest
-Supertest
-Artillery
-
-9.2 Unit Testing
-npm test tests/unit
-
-9.3 Integration Testing
-npm test tests/integration
-
-9.4 Performance Testing
-npx artillery run tests/performance/loadtest.yml
-
-9.5 Testing Checklist
-Unit tests passed
-API tested with integration tests
-Performance tested under load
-No major failures
-
-📌10. Security Notes
-Use JWT authentication
-Do not expose .env files
-Validate all inputs
-Use role-based access control
