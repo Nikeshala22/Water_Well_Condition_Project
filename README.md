@@ -1,7 +1,7 @@
 # Rural Water Well Monitoring & Reporting System
 Classification: Public-SLIIT
 
----
+
 
 📌 1. Project Overview
 
@@ -17,7 +17,7 @@ Report Module – well condition reports
 Lab Report Module – water quality testing  
 Repair Module – maintenance and repair tracking  
 
----
+
 
 📌 2. Technology Stack
 
@@ -42,7 +42,7 @@ Artillery
 Vitest  
 React Testing Library  
 
----
+
 
 📌 3. Project Structure
 ```text
@@ -62,7 +62,7 @@ water-well-system/
 └── README.md
 
 ```
----
+
 
 📌 4. Prerequisites
 
