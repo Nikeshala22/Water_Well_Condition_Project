@@ -3,7 +3,8 @@ import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
 import { useAuth } from "../context/AuthContext";
-const API_URL = import.meta.env.VITE_API_URL;
+import api from "../api/axios";
+
 
 const mapContainerStyle = { width: "100%", height: "300px", borderRadius: "1rem" };
 
@@ -65,13 +66,13 @@ const WellDetails = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         // 1. Well Details
-        const wellRes = await axios.get(`${API_URL}/api/wells/id/${id}`, { headers });
+        const wellRes = await api.get(`/wells/id/${id}`, { headers });
         setWell(wellRes.data.data);
 
         // 2. Lab Reports
         if (isAdmin || isLabTester || isCustomer) {
           try { 
-            const labRes = await axios.get(`${API_URL}/api/lab-reports/well/${id}`, { headers }); 
+            const labRes = await api.get(`/lab-reports/well/${id}`, { headers }); 
             setLabReports(labRes.data.data || labRes.data || []); 
           } catch (e) { console.log("Lab reports error"); }
         }
@@ -79,14 +80,14 @@ const WellDetails = () => {
         // 3. Maintenance & Field Reports
         if (isAdmin || isFieldOfficer || isCustomer) {
           try { 
-            const mainRes = await axios.get(`${API_URL}/api/maintenance/well/${id}`, { headers }); 
+            const mainRes = await api.get(`/maintenance/well/${id}`, { headers }); 
             setMaintenanceReports(mainRes.data.data || mainRes.data || []); 
           } catch (e) { console.log("Maintenance reports error"); }
           
           try { 
   // IMPORTANT: Verify if your backend expects the MongoDB _id or the String WellId
   // If your route uses Report.find({ wellId: req.params.wellId }), make sure you are sending well.wellId
-  const fieldRes = await axios.get(`${API_URL}/api/reports/well/${id}`, { headers }); 
+  const fieldRes = await api.get(`/reports/well/${id}`, { headers }); 
   
   console.log("Full API Response:", fieldRes); // Debugging line
 
@@ -117,7 +118,7 @@ const WellDetails = () => {
     if (!window.confirm(`Change status to ${newStatus}?`)) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.patch(`${API_URL}/api/wells/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.patch(`/wells/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
       setWell(prev => ({ ...prev, status: newStatus }));
     } catch (err) {
       alert("Failed to update status");

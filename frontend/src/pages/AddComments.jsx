@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL;
+import api from "../api/axios";
 
 const AddComments = () => {
   const { id } = useParams(); // Get reportId from URL
@@ -17,7 +16,7 @@ const AddComments = () => {
     const fetchReportInfo = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_URL}/api/reports/${id}`, {
+        const res = await api.get(`/reports/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setReportDetails(res.data);
@@ -35,8 +34,8 @@ const AddComments = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `${API_URL}/api/reports/${id}/comments`,
+      await api.post(
+        `/reports/${id}/comments`,
         { message },
         {
           headers: { Authorization: `Bearer ${token}` },

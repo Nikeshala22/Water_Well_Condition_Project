@@ -21,7 +21,7 @@ const MaintenanceForm = () => {
   useEffect(() => {
     const fetchWells = async () => {
       try {
-        const response = await api.get("/api/wells"); 
+        const response = await api.get("/wells"); 
         // Backend returns: { success: true, count: X, data: [...] }
         if (response.data && response.data.data) {
           setWells(response.data.data);
@@ -52,7 +52,7 @@ const MaintenanceForm = () => {
     }
 
     try {
-      await api.post("/api/maintenance", formData);
+      await api.post("/maintenance", formData);
       navigate("/maintenance");
     } catch (err) {
       setError(

@@ -32,8 +32,8 @@ const AdminDashboard = () => {
       try {
         setLoading(true);
         const [wellsRes, maintenanceRes] = await Promise.all([
-          api.get("/api/wells"),
-          api.get("/api/maintenance")
+          api.get(`/wells`),
+          api.get(`/maintenance`)
         ]);
 
         setWells(wellsRes.data.data);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL;
+import api from "../api/axios";
+
 
 const UpdateWellReport = () => {
   const { id } = useParams();
@@ -40,7 +40,7 @@ const UpdateWellReport = () => {
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/reports/${id}`, {
+        const res = await api.get(`/reports/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const { waterLevel, pumpStatus, severity, description, photos, comments } = res.data;
@@ -64,14 +64,14 @@ const UpdateWellReport = () => {
   const handleConfirmAction = async () => {
     try {
       if (confirmModal.type === "comment") {
-        await axios.delete(`${API_URL}/api/reports/${id}/comments/${confirmModal.id}`, {
+        await api.delete(`/reports/${id}/comments/${confirmModal.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setComments(comments.filter((c) => c._id !== confirmModal.id));
         showStatus("Comment removed permanently");
       } 
       else if (confirmModal.type === "report") {
-        await axios.delete(`${API_URL}/api/reports/${id}`, {
+        await api.delete(`/reports/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         showStatus("Report deleted successfully!");
@@ -90,8 +90,8 @@ const UpdateWellReport = () => {
       return;
     }
     try {
-      await axios.put(
-        `${API_URL}/api/reports/${id}/comments/${commentId}`,
+      await api.put(
+        `/reports/${id}/comments/${commentId}`,
         { message: editCommentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -119,7 +119,7 @@ const UpdateWellReport = () => {
     if (photo) data.append("photo", photo);
 
     try {
-      await axios.put(`${API_URL}/api/reports/${id}`, data, {
+      await api.put(`/reports/${id}`, data, {
         headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
       });
       showStatus("Report updated successfully!");

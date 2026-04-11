@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext"; // <-- Added AuthContext
-const API_URL = import.meta.env.VITE_API_URL;
+import api from "../api/axios";
+
 
 const WellsList = () => {
   const { user } = useAuth(); // <-- Destructure user to get their role
@@ -20,7 +20,7 @@ const WellsList = () => {
   const fetchWells = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/api/wells`, {
+      const res = await api.get(`/wells`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWells(res.data.data);
@@ -39,7 +39,7 @@ const WellsList = () => {
     if (window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`${API_URL}/api/wells/${id}`, {
+        await api.delete(`/wells/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setWells(wells.filter((well) => well._id !== id));

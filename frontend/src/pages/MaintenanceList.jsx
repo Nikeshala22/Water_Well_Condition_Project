@@ -18,7 +18,7 @@ const MaintenanceList = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/api/maintenance");
+      const response = await api.get("/maintenance");
       
       // If user is communityUser, only show their requests. 
       // (Ideally, backend should filter this, but for UX matching we can double check)

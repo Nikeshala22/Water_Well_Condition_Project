@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-const API_URL = import.meta.env.VITE_API_URL;
+import api from "../api/axios";
 
 const CommentsPage = () => {
   const { user } = useAuth();
@@ -31,7 +31,7 @@ const CommentsPage = () => {
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/reports/comments/all`, {
+      const response = await api.get(`/reports/comments/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setComments(response.data);
@@ -50,7 +50,7 @@ const CommentsPage = () => {
   const handleConfirmDelete = async () => {
     const { reportId, commentId } = confirmModal;
     try {
-      await axios.delete(`${API_URL}/api/reports/${reportId}/comments/${commentId}`, {
+      await api.delete(`/reports/${reportId}/comments/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setComments(comments.filter((c) => c.commentId !== commentId));
@@ -69,8 +69,8 @@ const CommentsPage = () => {
       return;
     }
     try {
-      await axios.put(
-        `${API_URL}/api/reports/${reportId}/comments/${commentId}`,
+      await api.put(
+        `/reports/${reportId}/comments/${commentId}`,
         { message: editCommentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
